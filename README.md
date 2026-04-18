@@ -25,6 +25,9 @@
 APEX Terminal is a self-hosted, AI-enhanced market analysis workstation designed for sophisticated traders and quantitative analysts. All AI inference routes through a locally running **LM Studio** instance — no cloud API costs, no third-party data leakage, complete privacy.
 
 ---
+## 📸 Screenshoot
+![APEX-AI-Terminal](https://github.com/LMLK-seal/APEX-AI-Terminal/blob/main/Screenshots/Screenshot.jpg)
+---
 
 ## ⚡ Quickstart (EXE Users)
 
