@@ -3,7 +3,7 @@
 <!-- LOGO / BANNER -->
 <img src="https://img.shields.io/badge/APEX%20TERMINAL-AI%20Financial%20Workstation-ff7a1a?style=for-the-badge&logo=python&logoColor=white" alt="APEX Terminal"/>
 
-# APEX Terminal
+# APEX AI Terminal
 
 ### AI-Powered Bloomberg-Style Financial Analysis Platform
 
