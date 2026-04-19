@@ -25,8 +25,8 @@
 APEX Terminal is a self-hosted, AI-enhanced market analysis workstation designed for sophisticated traders and quantitative analysts. All AI inference routes through a locally running **LM Studio** instance — no cloud API costs, no third-party data leakage, complete privacy.
 
 ---
-## 📸 Screenshoot
-![APEX-AI-Terminal](https://github.com/LMLK-seal/APEX-AI-Terminal/blob/main/Screenshots/Screenshot.jpg)
+## 📸 Animation
+![APEX-AI-Terminal](https://github.com/LMLK-seal/APEX-AI-Terminal/blob/main/Screenshots/Animation.gif)
 ---
 
 ## ⚡ Quickstart (EXE Users)
@@ -35,11 +35,14 @@ APEX Terminal is a self-hosted, AI-enhanced market analysis workstation designed
 
 1. Download from **[https://lmstudio.ai](https://lmstudio.ai)**
 2. Install and launch LM Studio
-3. In the **Discover** tab, download a model:
-   - `mistral-3-14b-instruct` — Great vision model - recommended
-   - `llama-3.1-8b-instruct` — balanced quality. (Text only)
-   - `Gemma-4-26b-a4b-it` — deep reasoning and Vision.
-   - `mistralai/mistral-nemo-instruct-2407` — Text only, great quality.
+3. In the **Discover** tab, search for and download one of these recommended models:
+
+| Model | Type | Notes |
+|-------|------|-------|
+| `mistral-3-14b-instruct` | Vision + Text | ⭐ Recommended |
+| `Gemma-4-26b-a4b-it` | Vision + Text | Deep reasoning |
+| `llama-3.1-8b-instruct` | Text only | Balanced, fast |
+| `mistralai/mistral-nemo-instruct-2407` | Text only | Great quality |
    
 4. Go to the **Local Server** tab → select your model → click **Start Server**
 5. Confirm: `Server running at http://localhost:1234`
@@ -74,9 +77,7 @@ The primary analysis workspace. Bloomberg-style candlestick chart with real-time
 | 5D | 5 days | 15 min | Short-swing setups |
 | 1M | 1 month | 1 hour | Swing trading |
 | 3M | 3 months | Daily | Medium-term trend |
-| 6M | 6 months | Daily | Position trading |
 | 1Y | 1 year | Daily | **Default — full cycle** |
-| 2Y | 2 years | Weekly | Multi-year structure |
 | 5Y | 5 years | Monthly | Strategic view |
 
 ### Indicator Toggles
@@ -162,6 +163,9 @@ Six institutional-grade quantitative models for risk and return framing.
 | **Scenario Analysis** | Bull / Base / Bear price targets with probability weights |
 | **Kelly Criterion** | Optimal position size fraction |
 | **Black-Scholes Probability** | Chance of exceeding a defined target price |
+| **Kalman state estimation** | optimal, recursive algorithm for estimating the state of a linear dynamic system from noisy measurements |
+| **Merton Jump Diffusion** | Diffusion process (geometric Brownian motion) with a discontinuous Poisson jump process. |
+| **Heston Stochastic Vol.** | Describes the evolution of the volatility of an underlying asset |
 
 **Configuration:** Simulations · Horizon (days) · Confidence level
 
