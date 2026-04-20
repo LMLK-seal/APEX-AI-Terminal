@@ -1,0 +1,22 @@
+# ── GUI & Charting ──
+PyQt6
+matplotlib
+
+# ── Data & Math Core ──
+pandas
+numpy
+
+# ── Market Data & News ──
+yfinance
+feedparser
+
+# ── API & Document Parsing ──
+requests
+pdfplumber
+
+# ── Advanced Quants & Machine Learning ──
+xgboost
+scikit-learn
+statsmodels
+hmmlearn
+vmdpy
