@@ -59,6 +59,21 @@ APEX Terminal is a self-hosted, AI-enhanced market analysis workstation designed
 2. Or type a symbol in the watchlist input box and press `Enter`
 3. The chart loads automatically with default indicators active
 
+## 📦 Installation (APEX_AI_Terminal.py)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/LMLK-seal/APEX-AI-Terminal.git
+cd APEX-AI-Terminal
+```
+
+### 2. Install Python dependencies
+
+```bash
+pip install PyQt6 yfinance matplotlib pandas numpy requests pdfplumber feedparser hmmlearn xgboost scikit-learn statsmodels vmdpy
+```
+
 ---
 
 ## 🖥️ Interface Layout
