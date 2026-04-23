@@ -825,7 +825,7 @@ class DataEngine:
     def __init__(self):
         self._cache = {}
 
-    def fetch(self, ticker, period='5d', interval='5m'):
+    def fetch(self, ticker, period='1y', interval='1d'):
         key = f"{ticker}|{period}|{interval}"
         if key in self._cache:
             ts, df = self._cache[key]
@@ -836,6 +836,8 @@ class DataEngine:
             if df.empty:
                 return None
             df.index = pd.to_datetime(df.index)
+            
+            df.attrs['ticker'] = ticker 
             self._cache[key] = (time.time(), df)
             return df
         except Exception as exc:
@@ -1182,6 +1184,183 @@ class DataEngine:
         except Exception:
             d['VP_POC'] = np.nan; d['VP_VAH'] = np.nan; d['VP_VAL'] = np.nan
             d['VP_Signal'] = 'N/A'
+
+        # ── ML SUPERTREND & CONFIDENCE ENGINE ─────────────────────────
+        try:
+            highs, lows, closes = d['High'].values, d['Low'].values, d['Close'].values
+            atr_val = d['ATR'].fillna(d['ATR'].mean()).values
+            hl2 = (highs + lows) / 2
+            multiplier = 3.0
+            
+            basic_ub = hl2 + (multiplier * atr_val)
+            basic_lb = hl2 - (multiplier * atr_val)
+            
+            final_ub = np.zeros(len(d))
+            final_lb = np.zeros(len(d))
+            supertrend = np.zeros(len(d))
+            st_dir = np.ones(len(d)) # 1 = Bullish, -1 = Bearish
+            
+            # 👇 FIX: Properly initialize Day 0 so the chart doesn't squash to $0.00!
+            final_ub[0] = basic_ub[0]
+            final_lb[0] = basic_lb[0]
+            supertrend[0] = final_ub[0]
+            
+            for i in range(1, len(d)):
+                # Update Upper Band
+                if basic_ub[i] < final_ub[i-1] or closes[i-1] > final_ub[i-1]:
+                    final_ub[i] = basic_ub[i]
+                else:
+                    final_ub[i] = final_ub[i-1]
+                    
+                # Update Lower Band
+                if basic_lb[i] > final_lb[i-1] or closes[i-1] < final_lb[i-1]:
+                    final_lb[i] = basic_lb[i]
+                else:
+                    final_lb[i] = final_lb[i-1]
+                    
+                # Update Trend Direction
+                if st_dir[i-1] == 1 and closes[i] < final_lb[i]:
+                    st_dir[i] = -1
+                elif st_dir[i-1] == -1 and closes[i] > final_ub[i]:
+                    st_dir[i] = 1
+                else:
+                    st_dir[i] = st_dir[i-1]
+                    
+                # Assign SuperTrend Line
+                supertrend[i] = final_lb[i] if st_dir[i] == 1 else final_ub[i]
+                
+            d['ST_Line'] = supertrend
+            d['ST_Dir']  = st_dir
+            
+            # Tri-Layer Confirmation Filters & ML Confidence Scoring
+            rsi = d['RSI'].fillna(50).values
+            vol_mean = d['Volume'].rolling(20).mean().fillna(1).values
+            rvol = d['Volume'].values / vol_mean
+            ma50 = d.get('MA50', d['Close']).values
+            
+            conf_scores = np.zeros(len(d))
+            buy_sigs = np.zeros(len(d), dtype=bool)
+            sell_sigs = np.zeros(len(d), dtype=bool)
+            
+            for i in range(1, len(d)):
+                # Detect Trend Flip
+                if st_dir[i] == 1 and st_dir[i-1] == -1:
+                    conf = 50 # Base probability
+                    if rsi[i] < 45: conf += 20     # Momentum Filter
+                    if rvol[i] > 1.2: conf += 20   # Flow Analysis
+                    if closes[i] > ma50[i]: conf += 10 # Regime Filter
+                    
+                    if conf >= 70: # Only trigger if ML filters approve
+                        conf_scores[i] = conf
+                        buy_sigs[i] = True
+                        
+                elif st_dir[i] == -1 and st_dir[i-1] == 1:
+                    conf = 50
+                    if rsi[i] > 55: conf += 20     # Momentum Filter
+                    if rvol[i] > 1.2: conf += 20   # Flow Analysis
+                    if closes[i] < ma50[i]: conf += 10 # Regime Filter
+                    
+                    if conf >= 70:
+                        conf_scores[i] = conf
+                        sell_sigs[i] = True
+                        
+            d['ML_ST_Buy'] = buy_sigs
+            d['ML_ST_Sell'] = sell_sigs
+            d['ML_ST_Conf'] = conf_scores
+            
+        except Exception as e:
+            print(f"ML SuperTrend Error: {e}")
+
+            
+        # ── LORENTZIAN PROBABILITY DETECTOR (KNN) ─────────────────────────
+        try:
+            highs, lows, closes = d['High'].values, d['Low'].values, d['Close'].values
+            
+            # 1. Build the 4D Feature Space (RSI, WT, CCI, ADX)
+            # CCI
+            tp = (highs + lows + closes) / 3
+            sma_tp = pd.Series(tp).rolling(20).mean()
+            mad_tp = pd.Series(tp).rolling(20).apply(lambda x: np.abs(x - x.mean()).mean())
+            cci = ((tp - sma_tp) / (0.015 * mad_tp + 1e-9)).values
+            
+            # ADX
+            tr = np.maximum(highs - lows, np.maximum(np.abs(highs - pd.Series(closes).shift(1)), np.abs(lows - pd.Series(closes).shift(1))))
+            up_m = highs - pd.Series(highs).shift(1)
+            dn_m = pd.Series(lows).shift(1) - lows
+            plus_dm = np.where((up_m > dn_m) & (up_m > 0), up_m, 0)
+            minus_dm = np.where((dn_m > up_m) & (dn_m > 0), dn_m, 0)
+            tr_sm = pd.Series(tr).rolling(14).sum()
+            plus_di = 100 * pd.Series(plus_dm).rolling(14).sum() / (tr_sm + 1e-9)
+            minus_di = 100 * pd.Series(minus_dm).rolling(14).sum() / (tr_sm + 1e-9)
+            dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-9)
+            adx = pd.Series(dx).rolling(14).mean().values
+            
+            # WaveTrend
+            ema1 = pd.Series(tp).ewm(span=10, adjust=False).mean()
+            ema2 = pd.Series(np.abs(tp - ema1)).ewm(span=10, adjust=False).mean()
+            ci = (tp - ema1) / (0.015 * ema2 + 1e-9)
+            wt1 = ci.ewm(span=21, adjust=False).mean()
+            wt2 = wt1.rolling(4).mean()
+            wt1_v, wt2_v = wt1.values, wt2.values
+            
+            # Normalize features to 0-1 range to prevent distance explosion
+            def norm(arr):
+                valid = arr[~np.isnan(arr)]
+                if len(valid) == 0: return arr
+                return (arr - np.min(valid)) / (np.max(valid) - np.min(valid) + 1e-9)
+                
+            f_rsi = norm(d['RSI'].fillna(50).values)
+            f_wt  = norm(wt1_v)
+            f_cci = norm(cci)
+            f_adx = norm(adx)
+            
+            features = np.column_stack([f_rsi, f_wt, f_cci, f_adx])
+            features = np.nan_to_num(features)
+            
+            # 2. Target Outcome (Did price go up after 4 bars?)
+            look_fwd = 4
+            future_closes = pd.Series(closes).shift(-look_fwd).values
+            outcomes = (future_closes > closes).astype(int)
+            
+            wt_cross_up = (wt1_v > wt2_v) & (pd.Series(wt1_v).shift(1) <= pd.Series(wt2_v).shift(1))
+            wt_cross_dn = (wt1_v < wt2_v) & (pd.Series(wt1_v).shift(1) >= pd.Series(wt2_v).shift(1))
+            
+            lor_prob = np.full(len(d), np.nan)
+            lor_pred = np.full(len(d), 0)
+            
+            K_neighbors = 15
+            
+            # 3. K-Nearest Neighbors Search with Lorentzian Distance
+            for i in range(50, len(d)):
+                if wt_cross_up[i] or wt_cross_dn[i]:
+                    valid_end = max(0, i - look_fwd)
+                    if valid_end < 10: continue
+                    
+                    hist_X = features[:valid_end]
+                    hist_Y = outcomes[:valid_end]
+                    curr_x = features[i]
+                    
+                    # Lorentzian Distance Formula
+                    distances = np.sum(np.log(1 + np.abs(hist_X - curr_x)), axis=1)
+                    
+                    # Find K nearest historical "twins"
+                    nearest_idx = np.argsort(distances)[:K_neighbors]
+                    nearest_dists = distances[nearest_idx]
+                    nearest_outs = hist_Y[nearest_idx]
+                    
+                    # 🚀 FIX: Inverse Distance Weighting to get smooth probabilities (e.g. 74.9%)
+                    weights = 1.0 / (nearest_dists + 1e-5)
+                    prob_up = np.sum(weights * nearest_outs) / np.sum(weights)
+                    
+                    lor_prob[i] = prob_up
+                    lor_pred[i] = 1 if wt_cross_up[i] else -1
+                    
+            d['Lor_Prob'] = lor_prob
+            d['Lor_Pred'] = lor_pred
+            
+        except Exception as e:
+            print(f"Lorentzian KNN Error: {e}")
+
             
         # ── MATHEMATICAL CANDLESTICK PATTERN SCANNER ─────────────────
         try:
@@ -1221,6 +1400,166 @@ class DataEngine:
             d.attrs['candle_pattern'] = pattern
         except:
             d.attrs['candle_pattern'] = "N/A"
+
+        # ── OVEREXTENSION TRENDLINE BREAKOUT (OETB) ───────────────────────
+        try:
+            from scipy.signal import argrelextrema
+            highs, lows, closes = d['High'].values, d['Low'].values, d['Close'].values
+            atr = d['ATR'].fillna(d['ATR'].mean()).values
+            n_bars = len(d)
+            
+            # 1. Find Pivot Highs and Lows (Order=5 bars)
+            piv_highs = argrelextrema(highs, np.greater, order=5)[0]
+            piv_lows = argrelextrema(lows, np.less, order=5)[0]
+            
+            # We only care about recent history to avoid overlapping clutter (last 150 bars)
+            piv_highs =[p for p in piv_highs if p > n_bars - 150]
+            piv_lows =[p for p in piv_lows if p > n_bars - 150]
+            
+            best_res, best_sup = None, None
+            max_res_touches, max_sup_touches = 0, 0
+            
+            # 2. Find best Resistance Line (Connecting Highs)
+            for i in range(len(piv_highs)):
+                for j in range(i+1, len(piv_highs)):
+                    x1, x2 = piv_highs[i], piv_highs[j]
+                    y1, y2 = highs[x1], highs[x2]
+                    if y2 >= y1: continue # Resistance should point down
+                    
+                    slope = (y2 - y1) / (x2 - x1)
+                    intercept = y1 - slope * x1
+                    
+                    # Touch Density Check (Min 3 touches within ATR tolerance)
+                    touches = 0
+                    tol = atr[x2] * 0.1 # Tolerance is 10% of current ATR
+                    for x in piv_highs:
+                        if x >= x1 and x <= x2:
+                            proj_y = slope * x + intercept
+                            if abs(highs[x] - proj_y) <= tol:
+                                touches += 1
+                                
+                    if touches >= 3 and touches >= max_res_touches:
+                        # Clean line check (no bars broke strongly above it between x1 and x2)
+                        clean = True
+                        for x_chk in range(x1+1, x2):
+                            if highs[x_chk] > (slope * x_chk + intercept) + tol:
+                                clean = False; break
+                        if clean:
+                            max_res_touches = touches
+                            best_res = (x1, y1, x2, y2, slope, intercept)
+
+            # 3. Find best Support Line (Connecting Lows)
+            for i in range(len(piv_lows)):
+                for j in range(i+1, len(piv_lows)):
+                    x1, x2 = piv_lows[i], piv_lows[j]
+                    y1, y2 = lows[x1], lows[x2]
+                    if y2 <= y1: continue # Support should point up
+                    
+                    slope = (y2 - y1) / (x2 - x1)
+                    intercept = y1 - slope * x1
+                    
+                    touches = 0
+                    tol = atr[x2] * 0.1
+                    for x in piv_lows:
+                        if x >= x1 and x <= x2:
+                            proj_y = slope * x + intercept
+                            if abs(lows[x] - proj_y) <= tol:
+                                touches += 1
+                                
+                    if touches >= 3 and touches >= max_sup_touches:
+                        clean = True
+                        for x_chk in range(x1+1, x2):
+                            if lows[x_chk] < (slope * x_chk + intercept) - tol:
+                                clean = False; break
+                        if clean:
+                            max_sup_touches = touches
+                            best_sup = (x1, y1, x2, y2, slope, intercept)
+
+            # 4. Breakout & Fib Detection
+            d.attrs['oetb_res'] = best_res
+            d.attrs['oetb_sup'] = best_sup
+            
+            # Check if broken on the last few bars
+            oetb_state = "No confirmed breakouts."
+            if best_res:
+                r_slope, r_int = best_res[4], best_res[5]
+                r_proj = r_slope * (n_bars - 1) + r_int
+                if closes[-1] > r_proj + (atr[-1] * 0.08): # Broken Resistance!
+                    swing = best_res[1] - best_res[3]
+                    fib_t1 = r_proj + (swing * 0.618)
+                    fib_t2 = r_proj + (swing * 1.618)
+                    oetb_state = f"BULLISH BREAKOUT of Descending Resistance! | T1: ${fib_t1:.2f} | T2: ${fib_t2:.2f}"
+                    d.attrs['oetb_fib_bull'] = (r_proj, fib_t1, fib_t2)
+
+            if best_sup:
+                s_slope, s_int = best_sup[4], best_sup[5]
+                s_proj = s_slope * (n_bars - 1) + s_int
+                if closes[-1] < s_proj - (atr[-1] * 0.08): # Broken Support!
+                    swing = best_sup[3] - best_sup[1]
+                    fib_t1 = s_proj - (swing * 0.618)
+                    fib_t2 = s_proj - (swing * 1.618)
+                    oetb_state = f"BEARISH BREAKDOWN of Ascending Support! | T1: ${fib_t1:.2f} | T2: ${fib_t2:.2f}"
+                    d.attrs['oetb_fib_bear'] = (s_proj, fib_t1, fib_t2)
+
+            d.attrs['oetb_state'] = oetb_state
+        except Exception as e:
+            print(f"OETB Error: {e}")
+
+        # ── INSIDER TRADING OVERLAY PREP ──────────────────────────────
+        try:
+            ticker_symbol = d.attrs.get('ticker', '')
+            if ticker_symbol:
+                tk = yf.Ticker(ticker_symbol)
+                df_ins = tk.insider_transactions
+                
+                if df_ins is not None and not df_ins.empty:
+                    # 1. Reset index and normalize column names
+                    df_ins = df_ins.reset_index()
+                    cols = [str(c).lower() for c in df_ins.columns]
+                    
+                    # 2. Dynamically find columns to avoid KeyErrors
+                    date_col = df_ins.columns[['date' in c for c in cols].index(True)] if any('date' in c for c in cols) else df_ins.columns[0]
+                    val_col = df_ins.columns[['value' in c for c in cols].index(True)] if any('value' in c for c in cols) else df_ins.columns[-1]
+                    trans_col = df_ins.columns[['trans' in c or 'text' in c for c in cols].index(True)] if any('trans' in c or 'text' in c for c in cols) else df_ins.columns[3]
+                    
+                    # 3. Clean strings (Strip $ and commas) and convert to dates/numbers
+                    df_ins['Parsed_Date'] = pd.to_datetime(df_ins[date_col], errors='coerce').dt.tz_localize(None)
+                    df_ins['Parsed_Value'] = pd.to_numeric(df_ins[val_col].astype(str).str.replace(r'[^\d.]', '', regex=True), errors='coerce').fillna(0)
+                    
+                    # 4. Filter for High Impact Trades (>$500k)
+                    high_impact = df_ins[df_ins['Parsed_Value'] >= 500000].copy()
+                    
+                    d['Ins_Signal'] = 0
+                    d['Ins_Value'] = 0.0
+                    
+                    if not high_impact.empty:
+                        chart_dates = d.index.tz_localize(None)
+                        
+                        for _, row in high_impact.iterrows():
+                            target_date = row['Parsed_Date']
+                            if pd.isnull(target_date): continue
+                            
+                            # Find closest chart bar using absolute time difference
+                            diffs = np.abs(chart_dates - target_date)
+                            match_idx = np.argmin(diffs)
+                            
+                            # Match if within 4 days (covers long holiday weekends)
+                            if diffs[match_idx] <= pd.Timedelta(days=4):
+                                val = float(row['Parsed_Value'])
+                                trans_str = str(row[trans_col])
+                                is_buy = 1 if 'Buy' in trans_str or 'Purchase' in trans_str else -1
+                                
+                                # Aggregate if multiple insiders trade on the exact same day
+                                curr_sig = d['Ins_Signal'].iloc[match_idx]
+                                if curr_sig == 0:
+                                    d.iloc[match_idx, d.columns.get_loc('Ins_Value')] = val
+                                    d.iloc[match_idx, d.columns.get_loc('Ins_Signal')] = is_buy
+                                elif curr_sig == is_buy:
+                                    # Stack the money on top of each other!
+                                    d.iloc[match_idx, d.columns.get_loc('Ins_Value')] += val
+        except Exception as e:
+            print(f"Insider Chart Overlay Error: {e}")
+
             
         return d
 
@@ -2832,6 +3171,20 @@ class WatchlistThread(QThread):
                 time.sleep(0.4)
             time.sleep(self.refresh_sec)
 
+class InsiderFetchThread(QThread):
+    data_ready = pyqtSignal(object)
+
+    def __init__(self, ticker):
+        super().__init__()
+        self.ticker = ticker
+
+    def run(self):
+        try:
+            tk = yf.Ticker(self.ticker)
+            df = tk.insider_transactions
+            self.data_ready.emit(df)
+        except Exception:
+            self.data_ready.emit(None)            
 
 class NewsThread(QThread):
     ready = pyqtSignal(list)
@@ -3467,7 +3820,7 @@ class TechnicalChart(QWidget):
         self.interval = "1d"
         # Indicator toggles
         self.opt = dict(ma=True, bb=True, vol=True, rsi=True, macd=False,
-                        vwap=True, atr=False, obv=False, cmf=False, rvi=False, scalp=False, gbm=False, maxp=False, fvg=False, kalman=False, gp=False, ptt=False, fft=False, vmd=False)
+                        vwap=True, atr=False, obv=False, cmf=False, rvi=False, scalp=False, gbm=False, maxp=False, fvg=False, kalman=False, gp=False, ptt=False, fft=False, vmd=False, mlst=False, lor=False, oetb=False, ins=True)
         self._threads = []
         self._setup_ui()
         BUS.ticker_changed.connect(self._on_ticker)
@@ -3541,19 +3894,58 @@ class TechnicalChart(QWidget):
         tb1_lay.addWidget(self._interval_cb)
         lay.addWidget(tb1)
 
+        # ── Scrollable Indicator Toolbar ──────────────────────────────
         tb2 = QWidget()
-        tb2.setFixedHeight(28)
+        tb2.setFixedHeight(34)
         tb2.setStyleSheet(f"background:{C['bg3']}; border-bottom:1px solid {C['border']};")
-        tb2_lay = QHBoxLayout(tb2)
-        tb2_lay.setContentsMargins(10, 0, 10, 0)
-        tb2_lay.setSpacing(12)
+        tb2_main_lay = QHBoxLayout(tb2)
+        tb2_main_lay.setContentsMargins(4, 0, 4, 0)
+        tb2_main_lay.setSpacing(4)
+
+        left_btn = QPushButton("◄")
+        left_btn.setFixedSize(26, 26)
+        # 👇 FIX: Added padding:0px to override the global stylesheet squishing the text
+        left_btn.setStyleSheet(f"background:{C['bg4']}; color:{C['accent']}; border:1px solid {C['border']}; font-weight:bold; font-size:14px; padding:0px;")
+        tb2_main_lay.addWidget(left_btn)
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setStyleSheet("border:none; background:transparent;")
+
+        scroll_widget = QWidget()
+        scroll_widget.setStyleSheet("background:transparent;")
+        self.tb2_lay = QHBoxLayout(scroll_widget)
+        self.tb2_lay.setContentsMargins(0, 0, 0, 0)
+        self.tb2_lay.setSpacing(12)
+
+        # Loop through all 21 indicators!
         for label, key in[("MA","ma"),("BB","bb"),("VOL","vol"),("RSI","rsi"),("MACD","macd"),
-                   ("VWAP","vwap"),("ATR","atr"),("OBV","obv"),("CMF","cmf"),("RVI","rvi"), ("SCALP","scalp"), ("GBM","gbm"), ("MAXP","maxp"), ("FVG","fvg"), ("KALMAN","kalman"), ("GP FORECAST","gp"), ("PRO TREND","ptt"), ("FFT CYCLE","fft"), ("VMD TARGET","vmd")]:
+                   ("VWAP","vwap"),("ATR","atr"),("OBV","obv"),("CMF","cmf"),("RVI","rvi"), 
+                   ("SCALP","scalp"), ("GBM","gbm"), ("MAXP","maxp"), ("FVG","fvg"), 
+                   ("KALMAN","kalman"), ("GP FORECAST","gp"), ("PRO TREND","ptt"), 
+                   ("FFT CYCLE","fft"), ("VMD TARGET","vmd"), ("ML SUPERTREND","mlst"), 
+                   ("LORENTZIAN","lor"), ("TREND BREAKOUT","oetb"), ("INSIDER","ins")]:
             cb = QCheckBox(label)
             cb.setChecked(self.opt[key])
             cb.stateChanged.connect(lambda s, k=key: self._toggle(k, s))
-            tb2_lay.addWidget(cb)
-        tb2_lay.addStretch()
+            self.tb2_lay.addWidget(cb)
+            
+        self.tb2_lay.addStretch()
+        self.scroll_area.setWidget(scroll_widget)
+        tb2_main_lay.addWidget(self.scroll_area)
+
+        right_btn = QPushButton("►")
+        right_btn.setFixedSize(26, 26)
+        # 👇 FIX: Added padding:0px
+        right_btn.setStyleSheet(f"background:{C['bg4']}; color:{C['accent']}; border:1px solid {C['border']}; font-weight:bold; font-size:14px; padding:0px;")
+        tb2_main_lay.addWidget(right_btn)
+
+        # Wire up the scroll buttons
+        left_btn.clicked.connect(lambda: self.scroll_area.horizontalScrollBar().setValue(self.scroll_area.horizontalScrollBar().value() - 200))
+        right_btn.clicked.connect(lambda: self.scroll_area.horizontalScrollBar().setValue(self.scroll_area.horizontalScrollBar().value() + 200))
+
         lay.addWidget(tb2)
 
         # ── Figure ────────────────────────────────────────────────────
@@ -3684,6 +4076,24 @@ class TechnicalChart(QWidget):
             return
             
         self.df = DE.add_indicators(df)
+
+        # 👇 FIX: Inject Insider data into the chart dataframe
+        try:
+            ins_df = DE.get_insider_activity(ticker) # We need to make sure this returns a DF or mapped data
+            # Let's map it:
+            df_ins = yf.Ticker(ticker).insider_transactions
+            if df_ins is not None and not df_ins.empty:
+                df_ins['Date'] = pd.to_datetime(df_ins['Date'])
+                self.df['Ins_Signal'] = 0
+                self.df['Ins_Value'] = 0.0
+                for _, row in df_ins.iterrows():
+                    match_idx = self.df.index.get_indexer([row['Date']], method='nearest')[0]
+                    val = float(str(row['Value']).replace(',', ''))
+                    if val > 500000: # High Impact threshold
+                        self.df.at[self.df.index[match_idx], 'Ins_Value'] = val
+                        self.df.at[self.df.index[match_idx], 'Ins_Signal'] = 1 if 'Buy' in str(row['Transaction']) else -1
+        except: pass
+
         self._render()
         
         # 🚨 SCALPING ALERTS 🚨
@@ -3983,7 +4393,82 @@ class TechnicalChart(QWidget):
                     # If the math fails, print giant red text!
                     y_mid = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
                     ax.text(n/2, y_mid, "VMD Math Error: Could not decompose signal.", color='red', fontsize=12, fontweight='bold', ha='center', backgroundcolor='black', zorder=20)
+
+        # ── ML SUPERTREND (DYNAMIC ATR ENVELOPE) ──────────────────────
+        if self.opt.get('mlst', False) and 'ST_Line' in df.columns:
+            st_line = df['ST_Line'].values
+            st_dir = df['ST_Dir'].values
+            
+            # Plot the line, changing color based on trend direction
+            for i in range(1, n):
+                if st_dir[i] == 1:
+                    ax.plot([idx[i-1], idx[i]], [st_line[i-1], st_line[i]], color='#00ffcc', linewidth=2, zorder=4)
+                else:
+                    ax.plot([idx[i-1], idx[i]], [st_line[i-1], st_line[i]], color='#ff0066', linewidth=2, zorder=4)
+            
+            # Plot the Confirmed ML Signals
+            buy_idx = np.where(df['ML_ST_Buy'].values)[0]
+            sell_idx = np.where(df['ML_ST_Sell'].values)[0]
+            
+            for i in buy_idx:
+                conf = df['ML_ST_Conf'].iloc[i]
+                y_pos = df['Low'].iloc[i] - df['ATR'].iloc[i] * 1.5
+                ax.plot([i, i], [df['Close'].iloc[i], y_pos], color='#00ffcc', linestyle=':', linewidth=1.5, zorder=4)
+                ax.text(i, y_pos, f"BUY {conf:.0f}%", color='black', fontweight='bold', fontsize=7, ha='center', va='center',
+                        bbox=dict(boxstyle="round,pad=0.3", fc='#00ffcc', ec="none"), zorder=10)
                 
+            for i in sell_idx:
+                conf = df['ML_ST_Conf'].iloc[i]
+                y_pos = df['High'].iloc[i] + df['ATR'].iloc[i] * 1.5
+                ax.plot([i, i], [df['Close'].iloc[i], y_pos], color='#ff0066', linestyle=':', linewidth=1.5, zorder=4)
+                ax.text(i, y_pos, f"SELL {conf:.0f}%", color='white', fontweight='bold', fontsize=7, ha='center', va='center',
+                        bbox=dict(boxstyle="round,pad=0.3", fc='#ff0066', ec="none"), zorder=10)           
+
+
+        # ── LORENTZIAN PROBABILITY DETECTOR ───────────────────────────
+        if self.opt.get('lor', False) and 'Lor_Prob' in df.columns:
+            for i in range(n):
+                prob = df['Lor_Prob'].iloc[i]
+                pred = df['Lor_Pred'].iloc[i]
+                if pd.notna(prob):
+                    if pred == 1: # Bullish WaveTrend Cross
+                        is_valid = prob >= 0.5
+                        color = '#00e676' if is_valid else '#ff007f' # Green if True, Pink if Lie
+                        text = f"✓ {prob*100:.1f}%" if is_valid else f"✗ {prob*100:.1f}%"
+                        y_pos = df['Low'].iloc[i] - df['ATR'].iloc[i] * 1.2
+                        ax.text(i, y_pos, text, color='white', fontweight='bold', fontsize=7, ha='center', va='top',
+                                bbox=dict(boxstyle="round,pad=0.3", fc=color, ec="none", alpha=0.9), zorder=12)
+                    
+                    elif pred == -1: # Bearish WaveTrend Cross
+                        is_valid = prob < 0.5
+                        color = '#00e676' if is_valid else '#ff007f'
+                        # For a short, probability of success is (1 - prob_up)
+                        text = f"✓ {(1-prob)*100:.1f}%" if is_valid else f"✗ {(1-prob)*100:.1f}%"
+                        y_pos = df['High'].iloc[i] + df['ATR'].iloc[i] * 1.2
+                        ax.text(i, y_pos, text, color='white', fontweight='bold', fontsize=7, ha='center', va='bottom',
+                                bbox=dict(boxstyle="round,pad=0.3", fc=color, ec="none", alpha=0.9), zorder=12)       
+
+        # ── INSIDER TRADING BADGES (C-Suite Whales) ───────────────────
+        if self.opt.get('ins', False) and 'Ins_Signal' in df.columns:
+            for i in range(n):
+                sig = df['Ins_Signal'].iloc[i]
+                if pd.notna(sig) and sig != 0:
+                    val = df['Ins_Value'].iloc[i]
+                    is_buy = (sig > 0)
+                    color = C['green'] if is_buy else C['red']
+                    txt = f" INSIDER {'BUY' if is_buy else 'SELL'} ${val/1e6:.1f}M "
+                    atr_val = df['ATR'].iloc[i] if pd.notna(df['ATR'].iloc[i]) else (df['Close'].iloc[i] * 0.02)
+                    
+                    if is_buy:
+                        y_pos = df['Low'].iloc[i] - (atr_val * 1.5)
+                        ax.scatter(i, df['Low'].iloc[i] - (atr_val * 0.5), marker='^', color=color, s=150, zorder=99)
+                        ax.text(i, y_pos, txt, color='white', fontsize=8, fontweight='bold', ha='center', va='top', 
+                                bbox=dict(boxstyle="round,pad=0.3", fc=color, ec="white", alpha=0.9), zorder=99)
+                    else:
+                        y_pos = df['High'].iloc[i] + (atr_val * 1.5)
+                        ax.scatter(i, df['High'].iloc[i] + (atr_val * 0.5), marker='v', color=color, s=150, zorder=99)
+                        ax.text(i, y_pos, txt, color='white', fontsize=8, fontweight='bold', ha='center', va='bottom', 
+                                bbox=dict(boxstyle="round,pad=0.3", fc=color, ec="white", alpha=0.9), zorder=99)
 
         # ── Price label + horizontal line ─────────────────────────────
         last = float(df['Close'].iloc[-1])
@@ -4070,6 +4555,40 @@ class TechnicalChart(QWidget):
                     ax.text(ex_idx, df['Close'].iloc[ex_idx], "EXIT", color='white', fontweight='bold', fontsize=7, ha='center', va='center',
                             bbox=dict(boxstyle="round,pad=0.3", fc=C['text3'], ec="none"), zorder=11)
                     
+        # ── OETB TRENDLINE & FIBONACCI RENDERER ───────────────────────
+        if self.opt.get('oetb', False) and 'oetb_res' in df.attrs:
+            res = df.attrs.get('oetb_res')
+            sup = df.attrs.get('oetb_sup')
+            
+            # Draw Resistance
+            if res:
+                x1, y1, x2, y2, slope, intercept = res
+                proj_y = slope * (n + 15) + intercept
+                ax.plot([x1, n + 15], [y1, proj_y], color=C['accent'], linewidth=2, label='Resistance')
+                
+            # Draw Support
+            if sup:
+                x1, y1, x2, y2, slope, intercept = sup
+                proj_y = slope * (n + 15) + intercept
+                ax.plot([x1, n + 15], [y1, proj_y], color=C['cyan'], linewidth=2, label='Support')
+                
+            # Draw Fibonacci Bullish Breakout Targets
+            if 'oetb_fib_bull' in df.attrs:
+                brk, t1, t2 = df.attrs['oetb_fib_bull']
+                ax.scatter(n-1, df['Close'].iloc[-1], color=C['green'], marker='^', s=150, zorder=10)
+                ax.plot([n-5, n+15], [t1, t1], color=C['green'], linestyle=':', linewidth=1.5)
+                ax.text(n+15, t1, f" FIB T1 (0.618): ${t1:.2f}", color=C['green'], fontsize=8, va='center')
+                ax.plot([n-5, n+15], [t2, t2], color=C['accent2'], linestyle=':', linewidth=1.5)
+                ax.text(n+15, t2, f" FIB T2 (1.618): ${t2:.2f}", color=C['accent2'], fontsize=8, va='center')
+
+            # Draw Fibonacci Bearish Breakdown Targets
+            if 'oetb_fib_bear' in df.attrs:
+                brk, t1, t2 = df.attrs['oetb_fib_bear']
+                ax.scatter(n-1, df['Close'].iloc[-1], color=C['red'], marker='v', s=150, zorder=10)
+                ax.plot([n-5, n+15], [t1, t1], color=C['red'], linestyle=':', linewidth=1.5)
+                ax.text(n+15, t1, f" FIB T1 (0.618): ${t1:.2f}", color=C['red'], fontsize=8, va='center')
+                ax.plot([n-5, n+15], [t2, t2], color=C['accent2'], linestyle=':', linewidth=1.5)
+                ax.text(n+15, t2, f" FIB T2 (1.618): ${t2:.2f}", color=C['accent2'], fontsize=8, va='center')            
         
         # ── Axis styling ──────────────────────────────────────────────
         ax.set_facecolor(C['bg'])
@@ -4418,19 +4937,36 @@ class AIChatPanel(QWidget):
         ptt_status = "No active PTT trade."
         if 'ptt_trades' in df.attrs and len(df.attrs['ptt_trades']) > 0:
             last_trade = df.attrs['ptt_trades'][-1]
-            if last_trade['exit_idx'] == len(df) - 1:  # If the exit index is the current live bar, it's active!
+            if last_trade['exit_idx'] == len(df) - 1:
                 tdir = "LONG" if last_trade['dir'] == 1 else "SHORT"
                 entry_p = last_trade['entry_p']
                 sl_p = last_trade['sl_p']
                 hits = len(last_trade['tp_hits'])
                 next_tp = last_trade['tps'][hits] if hits < len(last_trade['tps']) else "All TPs Hit"
-                if isinstance(next_tp, float): next_tp = f"${next_tp:.2f}"
+                if isinstance(next_tp, (float, int, np.floating, np.integer)): next_tp = f"${next_tp:.2f}"
                 ptt_status = f"ACTIVE {tdir} | Entry: ${entry_p:.2f} | Current SL: ${sl_p:.2f} | Targets Hit: {hits}/4 | Next Target: {next_tp}"
+
+        # ── LORENTZIAN ML DETECTOR FOR AI ──
+        lor_status = "No recent ML signals."
+        if df is not None and 'Lor_Prob' in df.columns:
+            for i in range(len(df)-1, -1, -1):
+                if not pd.isna(df['Lor_Prob'].iloc[i]):
+                    prob = df['Lor_Prob'].iloc[i]
+                    pred = df['Lor_Pred'].iloc[i]
+                    bars_ago = len(df) - 1 - i
+                    if pred == 1:
+                        v = "VALIDATED (Truth)" if prob >= 0.5 else "LIE (Fakeout)"
+                        lor_status = f"BULLISH WaveTrend Cross ({bars_ago} bars ago) -> {v} | Historical Win Prob: {prob*100:.1f}%"
+                    else:
+                        v = "VALIDATED (Truth)" if prob < 0.5 else "LIE (Fakeout)"
+                        lor_status = f"BEARISH WaveTrend Cross ({bars_ago} bars ago) -> {v} | Historical Win Prob: {(1-prob)*100:.1f}%"
+                    break
 
         # Base indicators
         summary = (
             f"Ticker : {ticker}\n"
             f"Price  : {fv('Close','.2f')}  |  Volume: {fv('Volume',',.0f')}\n"
+            f"OETB Trendline Structure: {df.attrs.get('oetb_state', 'N/A')}\n"
             f"MA20   : {fv('MA20','.2f')}  |  MA50 : {fv('MA50','.2f')}  |  MA200: {fv('MA200','.2f')}\n"
             f"BB_Upp : {fv('BB_U','.2f')}  |  BB_Low: {fv('BB_L','.2f')}\n"
             f"RSI(14): {fv('RSI','.1f')}  |  MACD : {fv('MACD','.4f')}  |  Signal: {fv('Signal','.4f')}\n"
@@ -4439,6 +4975,7 @@ class AIChatPanel(QWidget):
             f"RVI    : {fv('RVI','.4f')}   |  RVI Sig: {fv('RVI_Signal','.4f')}\n"
             f"Kalman True State: {fv('Kalman','.2f')}  |  Kalman Deviation: {fv('Kalman_Diff','.2f')}%\n"
             f"PTT Algorithmic State: {ptt_status}\n"
+            f"Lorentzian ML Detector: {lor_status}\n"
             f"52w Hi : {df['Close'].max():.2f}  |  52w Lo: {df['Close'].min():.2f}\n"
             f"Bars   : {len(df)}"
         )
@@ -5359,23 +5896,31 @@ Provide a concise, professional analysis covering:
         ptt_status = "No active PTT trade."
         if df is not None and 'ptt_trades' in df.attrs and len(df.attrs['ptt_trades']) > 0:
             last_trade = df.attrs['ptt_trades'][-1]
-            if last_trade['exit_idx'] == len(df) - 1:  # If the exit index is the current live bar, it's active!
+            if last_trade['exit_idx'] == len(df) - 1:
                 tdir = "LONG" if last_trade['dir'] == 1 else "SHORT"
                 entry_p = last_trade['entry_p']
                 sl_p = last_trade['sl_p']
                 hits = len(last_trade['tp_hits'])
                 next_tp = last_trade['tps'][hits] if hits < len(last_trade['tps']) else "All TPs Hit"
-                
-                # 👇 FIX: Format the number ONLY if it is actually a number!
-                if isinstance(next_tp, (float, int, np.floating, np.integer)):
-                    next_tp = f"${next_tp:.2f}"
-                    
+                if isinstance(next_tp, (float, int, np.floating, np.integer)): next_tp = f"${next_tp:.2f}"
                 ptt_status = f"ACTIVE {tdir} | Entry: ${entry_p:.2f} | Current SL: ${sl_p:.2f} | Targets Hit: {hits}/4 | Next Target: {next_tp}"
 
-        # Calculate VMD for the AI
-        vmd_res = DE.vmd_extrapolation(df) if df is not None else None
-        vmd_text = f"${vmd_res['target_30d']:.2f}" if vmd_res else "N/A"        
-                
+        # ── LORENTZIAN ML DETECTOR FOR AI ──
+        lor_status = "No recent ML signals."
+        if df is not None and 'Lor_Prob' in df.columns:
+            for i in range(len(df)-1, -1, -1):
+                if not pd.isna(df['Lor_Prob'].iloc[i]):
+                    prob = df['Lor_Prob'].iloc[i]
+                    pred = df['Lor_Pred'].iloc[i]
+                    bars_ago = len(df) - 1 - i
+                    if pred == 1:
+                        v = "VALIDATED (Truth)" if prob >= 0.5 else "LIE (Fakeout)"
+                        lor_status = f"BULLISH WaveTrend Cross ({bars_ago} bars ago) -> {v} | Historical Win Prob: {prob*100:.1f}%"
+                    else:
+                        v = "VALIDATED (Truth)" if prob < 0.5 else "LIE (Fakeout)"
+                        lor_status = f"BEARISH WaveTrend Cross ({bars_ago} bars ago) -> {v} | Historical Win Prob: {(1-prob)*100:.1f}%"
+                    break
+
         # ── Tech data block ───────────────────────────────────────────────
         price = g('Close')
         tech_data = f"""Ticker: {t}  |  Price: ${price}
@@ -5388,6 +5933,10 @@ ATR (14):          {g('ATR')}
 OBV trend:         {'Rising' if df is not None and len(df)>10 and float(df['OBV'].iloc[-1]) > float(df['OBV'].iloc[-10]) else 'Falling'}
 CMF (20):          {g('CMF')}
 RVI:               {g('RVI')}  |  RVI Signal: {g('RVI_Signal')}
+Kalman True State: ${g('Kalman')}
+Kalman Deviation:  {g('Kalman_Diff')}% (High deviation = noise)
+PTT Algorithmic State: {ptt_status}
+Lorentzian ML Detector: {lor_status}
 Market Regime:     {last.get('Market_Regime', 'N/A')}
 RSI Bull Div:      {last.get('RSI_Bull_Div', False)}
 RSI Bear Div:      {last.get('RSI_Bear_Div', False)}
@@ -5396,27 +5945,18 @@ VWAP (Cumulative): {g('VWAP_Cum')}  |  Upper2: {g('VWAP_Upper2')}  |  Lower2: {g
 Volume Profile:    POC: ${g('VP_POC')}  |  VAH: ${g('VP_VAH')}  |  VAL: ${g('VP_VAL')}
 VP Position:       {last.get('VP_Signal', 'N/A')}
 HMM Regime:        {hmm_result.get('regime', 'N/A')} ({hmm_result.get('confidence', 0)*100:.0f}% confidence)  |  Method: {hmm_result.get('method', 'N/A')}
-HMM Probs:         Bear={hmm_result.get('state_probs', [0,0,0])[0]*100:.0f}%  Sideways={hmm_result.get('state_probs', [0,0,0])[1]*100:.0f}%  Bull={hmm_result.get('state_probs', [0,0,0])[2]*100:.0f}%
+HMM Probs:         Bear={hmm_result.get('state_probs',[0,0,0])[0]*100:.0f}%  Sideways={hmm_result.get('state_probs', [0,0,0])[1]*100:.0f}%  Bull={hmm_result.get('state_probs', [0,0,0])[2]*100:.0f}%
 Regime Gate:       Active={gate_result.get('gate_active', False)}  |  {gate_result.get('reason', 'No suppression')}
 Kelly (Half):      {kelly.get('half_kelly', 0)}% of portfolio  |  Full: {kelly.get('kelly', 0)}%  |  Regime mod: {kelly.get('regime_mod', 1.0):.2f}x
 MTF Confluence:    {mtf_result.get('bias', 'N/A')} ({mtf_result.get('confluence_score', 0)}% bull)
 MTF Signals:       D={mtf_result.get('signals', {}).get('Daily','?')} | W={mtf_result.get('signals', {}).get('Weekly','?')} | M={mtf_result.get('signals', {}).get('Monthly','?')}
-Walk-Fwd WinRate:  RSI={wf_result.get('signals',{}).get('RSI_Oversold',{}).get('win_rate','N/A')}% | MACD={wf_result.get('signals',{}).get('MACD_Cross',{}).get('win_rate','N/A')}% | BB={wf_result.get('signals',{}).get('BB_Bounce',{}).get('win_rate','N/A')}%
+Walk-Fwd WinRate:  RSI={wf_result.get('signals',{}).get('RSI_Oversold',{}).get('win_rate','N/A')}% | MACD={wf_result.get('signals',{}).get('MACD_Cross',{}).get('win_rate','N/A')}%
 MC DCF P50:        ${mc_result.get('percentiles',{}).get('p50','N/A')} (upside {mc_result.get('upside_p50','N/A')}%)
-FFT Cycle Forecast: Next Peak in {fft_res['next_peak_days']} days. Next Trough in {fft_res['next_trough_days']} days.
-HMM Probs:         Bear={hmm_result.get('state_probs', [0,0,0])[0]*100:.0f}%  Sideways={hmm_result.get('state_probs', [0,0,0])[1]*100:.0f}%  Bull={hmm_result.get('state_probs',[0,0,0])[2]*100:.0f}%
+FFT Cycle Forecast: Next Peak in {fft_res['next_peak_days'] if fft_res else 'N/A'} days. Next Trough in {fft_res['next_trough_days'] if fft_res else 'N/A'} days.
+VMD Noise-Free Target (30d): {vmd_text}
 ML Prediction:     {xgb_result.get('interpretation', 'N/A')}
 Top Drivers:       {', '.join([f"{k} ({v*100:.1f}%)" for k, v in xgb_result.get('top_features', [])]) if 'top_features' in xgb_result else 'N/A'}
-Regime Gate:       Active={gate_result.get('gate_active', False)}  |  {gate_result.get('reason', 'No suppression')}
-RVI:               {g('RVI')}  |  RVI Signal: {g('RVI_Signal')}
-Kalman True State: ${g('Kalman')}
-Kalman Deviation:  {g('Kalman_Diff')}% (High deviation = pure noise, expect mean reversion to True State)
-Market Regime:     {last.get('Market_Regime', 'N/A')}
-Kalman True State: ${g('Kalman')}
-Kalman Deviation:  {g('Kalman_Diff')}% 
-PTT Algorithmic State: {ptt_status}  
-Market Regime:     {last.get('Market_Regime', 'N/A')}
-VMD Noise-Free Target (30d): {vmd_text}"""
+"""
 
         # ── Fundamental data block ────────────────────────────────────────
         def fi(k): return inf.get(k, 'N/A')
@@ -6729,7 +7269,190 @@ Be specific with real tickers and numbers. No generic commentary."""
             on_done=lambda: BUS.status_msg.emit("Screen complete"),
         )
         BUS.status_msg.emit("Running AI stock screen…")
+# ═══════════════════════════════════════════════════════════════════════════════
+# INSIDER TRADING PANEL
+# ═══════════════════════════════════════════════════════════════════════════════
+class InsiderPanel(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.current_ticker = ""
+        self._df = None
+        self._st = None
+        self._setup_ui()
+        BUS.ticker_changed.connect(self._on_global_ticker)
 
+    def _on_global_ticker(self, t):
+        self.current_ticker = t
+        self.tick_inp.setText(t)
+        self._fetch()
+
+    def _setup_ui(self):
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(8, 8, 8, 8)
+        lay.setSpacing(8)
+
+        # ── Toolbar ──
+        tb = QHBoxLayout()
+        lbl = QLabel("◈ CORPORATE INSIDER TRACKER")
+        lbl.setStyleSheet(f"color:{C['accent']}; font-weight:bold; font-size:13px; letter-spacing:1px; margin-right:15px;")
+        tb.addWidget(lbl)
+
+        self.tick_inp = QLineEdit()
+        self.tick_inp.setPlaceholderText("Ticker...")
+        self.tick_inp.setFixedWidth(80)
+        self.tick_inp.setFixedHeight(28)
+        self.tick_inp.returnPressed.connect(self._fetch)
+        tb.addWidget(self.tick_inp)
+
+        fetch_btn = QPushButton("🔍 Fetch SEC Form 4 Filings")
+        fetch_btn.setFixedHeight(28)
+        fetch_btn.clicked.connect(self._fetch)
+        tb.addWidget(fetch_btn)
+
+        ai_btn = QPushButton("🧠 AI Insider Analysis")
+        ai_btn.setFixedHeight(28)
+        ai_btn.setStyleSheet(f"""
+            QPushButton {{ background:#1a0a2a; border:1px solid {C['purple']}; color:{C['purple']}; font-weight:bold; padding:0 16px; }}
+            QPushButton:hover {{ background:{C['purple']}; color:white; }}
+        """)
+        ai_btn.clicked.connect(self._analyze)
+        tb.addWidget(ai_btn)
+        
+        tb.addStretch()
+        lay.addLayout(tb)
+
+        # ── Splitter ──
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # Table
+        self.table = QTableWidget(0, 6)
+        self.table.setHorizontalHeaderLabels(["DATE", "INSIDER NAME", "POSITION", "TRANSACTION", "SHARES", "VALUE ($)"])
+        h = self.table.horizontalHeader()
+        h.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        h.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.verticalHeader().setVisible(False)
+        self.table.setAlternatingRowColors(True)
+        splitter.addWidget(self.table)
+
+        # AI Output
+        self.ai_out = QTextEdit()
+        self.ai_out.setReadOnly(True)
+        self.ai_out.setPlaceholderText("AI Analysis of C-Suite accumulation/distribution will appear here...")
+        self.ai_out.setStyleSheet(f"background:{C['bg2']}; border:1px solid {C['border']}; padding:10px; font-size:12px;")
+        splitter.addWidget(self.ai_out)
+
+        splitter.setSizes([700, 400])
+        lay.addWidget(splitter)
+
+        self.stat_lbl = QLabel("Ready.")
+        self.stat_lbl.setStyleSheet(f"color:{C['text3']}; font-size:10px;")
+        lay.addWidget(self.stat_lbl)
+
+    def _fetch(self):
+        t = self.tick_inp.text().strip().upper()
+        if not t: return
+        self.current_ticker = t
+        self.stat_lbl.setText(f"⟳ Scraping SEC EDGAR database for {t} insider trades...")
+        
+        self.thread = InsiderFetchThread(t)
+        self.thread.data_ready.connect(self._on_data)
+        self.thread.start()
+
+    def _on_data(self, df):
+        self.table.setRowCount(0)
+        self._df = df
+        
+        # 1. Guard against ETFs, missing data, or empty dataframes
+        if df is None or not isinstance(df, pd.DataFrame) or df.empty or len(df.columns) < 2:
+            self.stat_lbl.setText(f"✗ No recent insider transactions found for {self.current_ticker} (May be an ETF or no data).")
+            return
+            
+        self.stat_lbl.setText(f"✓ SEC Form 4 Filings loaded for {self.current_ticker}.")
+        self.table.setRowCount(len(df))
+        
+        # 2. Dynamically find columns using a safe helper function (Fixes Pandas 2.0 crash)
+        cols =[str(c).lower() for c in df.columns]
+        
+        def get_col(keywords, default_idx):
+            for i, c in enumerate(cols):
+                if any(k in c for k in keywords):
+                    return df.columns[i]
+            # Fallback safely if column doesn't exist
+            return df.columns[default_idx] if len(df.columns) > default_idx else df.columns[-1]
+
+        date_col   = get_col(['date'], 0)
+        name_col   = get_col(['insider', 'name'], 1)
+        pos_col    = get_col(['position', 'title'], 2)
+        trans_col  = get_col(['trans', 'text'], 3)
+        shares_col = get_col(['share'], 4)
+        val_col    = get_col(['value'], 5)
+
+        # 3. Populate Table Safely
+        for i, row in df.iterrows():
+            trans_type = str(row.get(trans_col, "Unknown"))
+            
+            # Determine Color (Buy = Green, Sell = Red)
+            color = C['text']
+            if 'Buy' in trans_type or 'Purchase' in trans_type: color = C['green']
+            elif 'Sell' in trans_type or 'Sale' in trans_type: color = C['red']
+
+            # Formatting numbers with fallback for N/A
+            try: shares_str = f"{int(row[shares_col]):,}"
+            except: shares_str = str(row.get(shares_col, "─"))
+            
+            try: val_str = f"${int(row[val_col]):,}"
+            except: val_str = str(row.get(val_col, "─"))
+
+            def _item(text, colr):
+                it = QTableWidgetItem(str(text))
+                it.setForeground(QColor(colr))
+                return it
+
+            self.table.setItem(i, 0, _item(str(row.get(date_col, ""))[:10], C['text2']))
+            self.table.setItem(i, 1, _item(row.get(name_col, "Unknown"), C['accent2']))
+            self.table.setItem(i, 2, _item(row.get(pos_col, "Unknown"), C['text3']))
+            self.table.setItem(i, 3, _item(trans_type, color))
+            
+            it_sh = _item(shares_str, color)
+            it_sh.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self.table.setItem(i, 4, it_sh)
+            
+            it_val = _item(val_str, color)
+            it_val.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self.table.setItem(i, 5, it_val)
+
+    def _analyze(self):
+        if not LM.connected:
+            self.ai_out.setHtml(f"<p style='color:{C['red']}'>⚠ LM Studio not connected.</p>")
+            return
+        if self._df is None or self._df.empty:
+            self.ai_out.setHtml(f"<p style='color:{C['red']}'>⚠ Fetch insider data first.</p>")
+            return
+            
+        self.ai_out.clear()
+        BUS.status_msg.emit("Analyzing C-Suite Insider Sentiment...")
+        
+        # Pass the top 30 transactions to the AI
+        raw_data = self._df.head(30).to_string()
+        
+        prompt = f"""Act as a Tier-1 Corporate Intelligence Analyst. Analyze the following recent SEC Form 4 Insider Trades for {self.current_ticker}.
+
+[RAW INSIDER TRANSACTIONS]
+{raw_data}
+
+Provide a structured analysis covering:
+1. **NET SENTIMENT**: Is the C-Suite actively accumulating (buying) or distributing (selling) shares? 
+2. **KEY PLAYERS**: Note any specific trades by the CEO, CFO, or Directors. Are they significant?
+3. **SIZE & CONVICTION**: Evaluate the dollar amount of these trades. Is this routine algorithmic selling (e.g., tax harvesting/options exercising) or high-conviction open market buying?
+4. **VERDICT**: What is the ultimate Insider Signal (BULLISH / BEARISH / NEUTRAL) and how strongly should we weight it?
+"""
+        self._st = stream_into(
+            self.ai_out, [{"role": "user", "content": prompt}],
+            system="You are an expert at tracking illegal and legal insider trading footprints.",
+            max_tokens=1000
+        )
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # SETTINGS PANEL
@@ -6988,6 +7711,22 @@ class AIBotThread(QThread):
                         tdir = "LONG" if last_trade['dir'] == 1 else "SHORT"
                         ptt_status = f"ACTIVE {tdir} | Entry: ${last_trade['entry_p']:.2f} | SL: ${last_trade['sl_p']:.2f}"
 
+                # ── LORENTZIAN ML DETECTOR FOR AI ──
+                lor_status = "No recent ML signals."
+                if df is not None and 'Lor_Prob' in df.columns:
+                    for i in range(len(df)-1, -1, -1):
+                        if not pd.isna(df['Lor_Prob'].iloc[i]):
+                            prob = df['Lor_Prob'].iloc[i]
+                            pred = df['Lor_Pred'].iloc[i]
+                            bars_ago = len(df) - 1 - i
+                            if pred == 1:
+                                v = "VALIDATED (Truth)" if prob >= 0.5 else "LIE (Fakeout)"
+                                lor_status = f"BULLISH WaveTrend Cross ({bars_ago} bars ago) -> {v} | Historical Win Prob: {prob*100:.1f}%"
+                            else:
+                                v = "VALIDATED (Truth)" if prob < 0.5 else "LIE (Fakeout)"
+                                lor_status = f"BEARISH WaveTrend Cross ({bars_ago} bars ago) -> {v} | Historical Win Prob: {(1-prob)*100:.1f}%"
+                            break
+
                 # 👇 ENHANCED REAL-TIME NEWS FETCHER 👇
                 self.log_msg.emit(f"📰 Scanning recent news and summaries for {self.ticker}...")
                 news_str = "No recent news."
@@ -6996,14 +7735,12 @@ class AIBotThread(QThread):
                     if HAS_FEED:
                         url = f"https://feeds.finance.yahoo.com/rss/2.0/headline?s={self.ticker}&region=US&lang=en-US"
                         feed = feedparser.parse(url)
-                        for e in feed.entries[:3]: # Top 3 most recent articles
+                        for e in feed.entries[:3]: 
                             title = e.get('title', '').strip()
                             summary = e.get('summary', '').strip()
-                            # Clean any messy HTML tags out of the summary
                             summary = re.sub('<[^<]+>', '', summary)[:250] 
                             news_list.append(f"Headline: {title}\nSummary: {summary}...")
                             
-                    # Fallback to standard yfinance if RSS fails
                     if not news_list and HAS_YF:
                         tk = yf.Ticker(self.ticker)
                         for n in tk.news[:3]:
@@ -7013,7 +7750,6 @@ class AIBotThread(QThread):
                         news_str = "\n\n".join(news_list)
                 except Exception:
                     pass
-                # 👆 END NEWS FETCHER 👆
 
                 # ── HEADLESS VISION RENDERING (Only if enabled!) ──
                 bot_img_b64 = ""
@@ -7071,7 +7807,10 @@ Order Flow Imbalance (10-bar): {order_flow_imbalance:,.0f} (Positive=Accumulatio
 
 [TECHNICALS]
 RSI: {fv(last.get('RSI'))} | MACD: {fv(last.get('MACD'))}
+OETB Trendline Breakout State: {df.attrs.get('oetb_state', 'N/A')}
 VWAP: ${fv(last.get('VWAP'))} | PTT State: {ptt_status}
+Lorentzian ML Detector: {lor_status}
+ML SuperTrend State: {'BULLISH' if df['ST_Dir'].iloc[-1] == 1 else 'BEARISH'} (Trailing Stop: ${fv(last.get('ST_Line'))})
 
 [MODELS]
 XGBoost: {xgb_res.get('prob_up', 0)*100:.1f}% UP probability.
@@ -7391,14 +8130,20 @@ class MainWindow(QMainWindow):
         self.screener = ScreenerPanel()
         self.settings = SettingsPanel()
         self.ai_trader = AITraderPanel()
+        
+        # 👇 1. Instantiate the Insider Panel 👇
+        self.insider_pnl = InsiderPanel()
 
         self.tabs.addTab(self.chart,    "◈  CHART")
         self.tabs.addTab(self.analysis, "⊞  ANALYSIS")
         self.tabs.addTab(self.docs,     "📄  DOCUMENTS")
         self.tabs.addTab(self.prob,     "⬡  PROBABILITY")
         self.tabs.addTab(self.news_pnl, "📰  NEWS")
+        
+        # 👇 2. Add it to the UI 👇
+        self.tabs.addTab(self.insider_pnl, "👔  INSIDER")
+        
         self.tabs.addTab(self.screener, "🔍  SCREENER")
-        # 👇 2. ADD THE TAB HERE 👇
         self.tabs.addTab(self.ai_trader,"🤖  AI TRADER")
         self.tabs.addTab(self.settings, "⚙  SETTINGS")
 
