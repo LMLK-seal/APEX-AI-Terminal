@@ -113,7 +113,7 @@ The primary analysis workspace. Bloomberg-style candlestick chart with real-time
 | GBM | Monte Carlo path overlay | OFF | Probabilistic future range cloud |
 | MAXP | Options Max Pain | OFF | Strike-pinning and expiry gravity |
 | FVG | Fair Value Gaps | OFF | Institutional imbalance zones |
-| Regime | Market Regime (HMM) | OFF | Behavior classification |
+| Markov Model (HMM | Market Regime (HMM) | OFF | clustering algorithm, It looks at the mathematical returns and volatility of the last 250 days and tries to group them into "regimes|
 | VP | Volume Profile | OFF | POC / value-area levels |
 | KALMAN | Kalman-Filter | OFF | Algorithm can recover the true state of the underlying object being tracked|
 | GP Forcast | Genetic Programming | OFF | Shows you the mathematical 95% confidence bounds of where the price can go|
