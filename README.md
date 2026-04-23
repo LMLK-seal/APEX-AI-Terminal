@@ -198,25 +198,26 @@ Three-panel market intelligence workspace.
 
 ---
 
-## 🔍 SCREENER Tab
+## 📰 NEWS Tab
 
-Natural-language AI stock screener returning ranked institutional-style candidates.
+Three-panel market intelligence workspace.
 
-**Usage:** Type a query or click a preset → press Enter or click SCREEN
+- **Global News** — broad RSS feed from multiple financial sources
+- **Ticker News** — symbol-specific headline pull
+- **Auto-Score Feed** — per-headline AI scoring: BULLISH/BEARISH/NEUTRAL + score (–10 to +10) + summary
+- **Bulk Sentiment** — portfolio-level AI synthesis: composite score, themes, sector signals, key risk/opportunity
+- **Live Ticker Bar** — scrolling headline strip with orange LIVE badge at the bottom of the window
 
-**Preset screens:**
+---
+## 🔍 Insider Trading Tab
 
-| Preset | Criteria |
-|--------|----------|
-| Value | Low P/E, positive FCF, dividend-paying |
-| Growth | Revenue growth 25%+, expanding margins, large TAM |
-| Quality | ROE 20%+, consistent earnings, reasonable valuation |
-| Momentum | Near 52W high, strong relative strength vs SPY |
-| Dividends | 3%+ yield, 10+ years consecutive growth |
-| Deep Value | Near 52W low, P/B <1, asset-rich, hidden catalyst |
-| AI Plays | Pure-play AI/ML with strong revenue growth and moats |
+- **Filtering Noise:** By setting the threshold at $500k, you ignore the tiny, routine sales that executives do every month for tax purposes. You only see the heavy accumulation or the massive exit.
 
-**Output format:** Criteria summary → Top 10 picks (with thesis, risk, conviction) → Sector overview → Portfolio construction notes
+- **Contextual Trading:** You will see the Red "SELL" badge appear exactly at the peak of a rally (often right before a drop), or a Green "BUY" badge appear exactly at the bottom of a panic dip.
+
+- **Institutional Confidence:** It adds a layer of "Fundamental Truth" to your technical chart. When you see a "BUY" badge from an insider right at your cyan "Support" line from the trendline breakout tool, you have one of the highest conviction trades possible.
+
+- **The Checkbox:** You can now actually toggle the indicator on and off from the top menu to view the Insider Trading visually.
 
 ---
 
