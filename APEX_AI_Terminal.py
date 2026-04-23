@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║   APEX AI TERMINAL  v1.0  ·  AI-Powered Bloomberg-Style Financial Platform     ║
-║   Local AI via LM Studio  ·  Real-time Data via yfinance  ·  PyQt6         ║
+║   APEX AI TERMINAL  v1.0  ·  AI-Powered Bloomberg-Style Financial Platform   ║
+║   Local AI via LM Studio  ·  Real-time Data via yfinance  ·  PyQt6           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 FEATURES:
@@ -3820,7 +3820,7 @@ class TechnicalChart(QWidget):
         self.interval = "1d"
         # Indicator toggles
         self.opt = dict(ma=True, bb=True, vol=True, rsi=True, macd=False,
-                        vwap=True, atr=False, obv=False, cmf=False, rvi=False, scalp=False, gbm=False, maxp=False, fvg=False, kalman=False, gp=False, ptt=False, fft=False, vmd=False, mlst=False, lor=False, oetb=False, ins=True)
+                        vwap=True, atr=False, obv=False, cmf=False, rvi=False, scalp=False, gbm=False, maxp=False, fvg=False, kalman=False, gp=False, ptt=False, fft=False, vmd=False, mlst=False, lor=False, oetb=False, ins=True, vp=False, hmm=False)
         self._threads = []
         self._setup_ui()
         BUS.ticker_changed.connect(self._on_ticker)
@@ -3920,13 +3920,14 @@ class TechnicalChart(QWidget):
         self.tb2_lay.setContentsMargins(0, 0, 0, 0)
         self.tb2_lay.setSpacing(12)
 
-        # Loop through all 21 indicators!
+        # Loop through all indicators!
         for label, key in[("MA","ma"),("BB","bb"),("VOL","vol"),("RSI","rsi"),("MACD","macd"),
                    ("VWAP","vwap"),("ATR","atr"),("OBV","obv"),("CMF","cmf"),("RVI","rvi"), 
                    ("SCALP","scalp"), ("GBM","gbm"), ("MAXP","maxp"), ("FVG","fvg"), 
                    ("KALMAN","kalman"), ("GP FORECAST","gp"), ("PRO TREND","ptt"), 
                    ("FFT CYCLE","fft"), ("VMD TARGET","vmd"), ("ML SUPERTREND","mlst"), 
-                   ("LORENTZIAN","lor"), ("TREND BREAKOUT","oetb"), ("INSIDER","ins")]:
+                   ("LORENTZIAN","lor"), ("TREND BREAKOUT","oetb"), ("INSIDER","ins"), 
+                   ("VOL PROFILE","vp"), ("HMM REGIME","hmm")]:
             cb = QCheckBox(label)
             cb.setChecked(self.opt[key])
             cb.stateChanged.connect(lambda s, k=key: self._toggle(k, s))
@@ -4138,8 +4139,8 @@ class TechnicalChart(QWidget):
         n   = len(df)
         idx = np.arange(n)
         
-        # 🚀 FORCE Chart Expansion for GBM, GP, FFT, and VMD
-        x_max_val = (n + 35) if (self.opt.get('gbm', False) or self.opt.get('gp', False) or self.opt.get('fft', False) or self.opt.get('vmd', False)) else ((n + 15) if self.opt.get('fvg', False) else (n + 2))
+        # 🚀 FORCE Chart Expansion
+        x_max_val = (n + 35) if (self.opt.get('gbm', False) or self.opt.get('gp', False) or self.opt.get('fft', False) or self.opt.get('vmd', False) or self.opt.get('vp', False)) else ((n + 15) if self.opt.get('fvg', False) else (n + 2))
 
         # ── subplot layout ────────────────────────────────────────────
         ratios = [5]
@@ -4588,7 +4589,87 @@ class TechnicalChart(QWidget):
                 ax.plot([n-5, n+15], [t1, t1], color=C['red'], linestyle=':', linewidth=1.5)
                 ax.text(n+15, t1, f" FIB T1 (0.618): ${t1:.2f}", color=C['red'], fontsize=8, va='center')
                 ax.plot([n-5, n+15], [t2, t2], color=C['accent2'], linestyle=':', linewidth=1.5)
-                ax.text(n+15, t2, f" FIB T2 (1.618): ${t2:.2f}", color=C['accent2'], fontsize=8, va='center')            
+                ax.text(n+15, t2, f" FIB T2 (1.618): ${t2:.2f}", color=C['accent2'], fontsize=8, va='center')
+
+        # ── VOLUME PROFILE (VP) ───────────────────────────────────────
+        if self.opt.get('vp', False):
+            try:
+                # 🚀 FIX: Calculate it right here on-the-fly to guarantee it never fails!
+                closes = df['Close'].values
+                vols = df['Volume'].values
+                
+                # Create 30 price bins
+                hist, bin_edges = np.histogram(closes, bins=30, weights=vols)
+                poc_idx = np.argmax(hist)
+                poc = (bin_edges[poc_idx] + bin_edges[poc_idx+1]) / 2
+                
+                # Find Value Area (70% of total volume)
+                total_vol = hist.sum()
+                va_vol = hist[poc_idx]
+                va_lo, va_hi = poc_idx, poc_idx
+                
+                while va_vol < total_vol * 0.70:
+                    expand_up = va_hi + 1 < len(hist)
+                    expand_dn = va_lo - 1 >= 0
+                    
+                    if expand_up and expand_dn:
+                        if hist[va_hi + 1] >= hist[va_lo - 1]:
+                            va_hi += 1
+                            va_vol += hist[va_hi]
+                        else:
+                            va_lo -= 1
+                            va_vol += hist[va_lo]
+                    elif expand_up:
+                        va_hi += 1
+                        va_vol += hist[va_hi]
+                    elif expand_dn:
+                        va_lo -= 1
+                        va_vol += hist[va_lo]
+                    else:
+                        break
+                        
+                vah = (bin_edges[va_hi] + bin_edges[va_hi+1]) / 2
+                val = (bin_edges[va_lo] + bin_edges[va_lo+1]) / 2
+
+                # Draw the Value Area shaded box
+                ax.axhspan(val, vah, color=C['blue'], alpha=0.25, zorder=1)
+                
+                # Draw Point of Control (POC) line
+                ax.axhline(poc, color=C['blue'], linestyle='-', linewidth=2, alpha=0.9, zorder=2)
+                
+                # Add Labels
+                ax.text(n + 2, poc, f" POC: ${poc:.2f}", color=C['blue'], fontsize=8, fontweight='bold', va='center', zorder=10)
+                ax.text(n + 2, vah, f" VAH: ${vah:.2f}", color=C['blue'], fontsize=8, va='bottom', zorder=10)
+                ax.text(n + 2, val, f" VAL: ${val:.2f}", color=C['blue'], fontsize=8, va='top', zorder=10)
+            except Exception as e:
+                y_mid = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
+                ax.text(n/2, y_mid, f"VP Render Error: {str(e)}", color='red', fontsize=12, fontweight='bold', ha='center', backgroundcolor='black')
+
+        # ── HMM MARKET REGIME BACKGROUND ──────────────────────────────
+        if self.opt.get('hmm', False):
+            try:
+                if 'hmm_series' not in df.attrs:
+                    res = HMM_DETECTOR.fit_predict(df)
+                    rs = res.get('regime_series', pd.Series(dtype=str))
+                    if not rs.empty and len(rs) == n:
+                        df.attrs['hmm_series'] = rs.values
+                    else:
+                        # Safe fallback
+                        df.attrs['hmm_series'] = np.full(n, res.get('regime', 'UNKNOWN'))
+
+                # Force format to prevent string matching bugs
+                hmm_vals = np.array([str(v).strip().upper() for v in df.attrs['hmm_series']])
+                
+                # 🚀 FIX: Use get_xaxis_transform() so the background perfectly covers top-to-bottom!
+                trans = ax.get_xaxis_transform()
+                
+                ax.fill_between(idx, 0, 1, where=(hmm_vals == 'BULL'), color=C['green'], alpha=0.15, zorder=0, transform=trans, linewidth=0)
+                ax.fill_between(idx, 0, 1, where=(hmm_vals == 'BEAR'), color=C['red'], alpha=0.15, zorder=0, transform=trans, linewidth=0)
+                ax.fill_between(idx, 0, 1, where=(hmm_vals == 'SIDEWAYS'), color=C['yellow'], alpha=0.15, zorder=0, transform=trans, linewidth=0)
+            except Exception as e:
+                y_mid = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
+                ax.text(n/2, y_mid, f"HMM Render Error: {str(e)}", color='red', fontsize=12, fontweight='bold', ha='center', backgroundcolor='black')
+                
         
         # ── Axis styling ──────────────────────────────────────────────
         ax.set_facecolor(C['bg'])
