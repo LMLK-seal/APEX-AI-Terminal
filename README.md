@@ -115,6 +115,14 @@ The primary analysis workspace. Bloomberg-style candlestick chart with real-time
 | FVG | Fair Value Gaps | OFF | Institutional imbalance zones |
 | Regime | Market Regime (HMM) | OFF | Behavior classification |
 | VP | Volume Profile | OFF | POC / value-area levels |
+| KALMAN | Kalman-Filter | OFF | Algorithm can recover the true state of the underlying object being tracked|
+| GP Forcast | Genetic Programming | OFF | Shows you the mathematical 95% confidence bounds of where the price can go|
+| VMD Target | VMD | OFF | Strips away all retail noise and projects the true underlying institutional trend, pointing aggressively upwards to the top of the GP cone.|
+| FFT Cycle | Fast Fourier Transform | OFF | Shows you the pure, harmonic rhythm of the stock, predicting a trough immediately and a peak exactly 30 days from now.|
+| Pro Trand | Pro Trend Trader suite | OFF | Used to execute a single-day-trading-strategy, improves trading returns|
+| Lorentzian  | Lorentzian Probability Detector | OFF | Using Machine Learning to measure the distance between the current market and historical "twins"|
+| ML SUPERTREND | Mt5 | OFF | An advanced SuperTrend that leverages Machine Learning for dynamic parameter optimization.|
+| Insider | insider trading | ✅ ON | view the Insider Trading visually|
 
 ---
 
