@@ -323,11 +323,15 @@ The `.exe` bundles the Python runtime and all core libraries.
 
 ---
 
+## ⚠️ Disclaimer
+
+APEX AI Terminal is provided for **educational and research purposes only**. Nothing in this software constitutes financial advice. Always conduct your own due diligence before making any trading or investment decisions. Past signal performance does not guarantee future results.
+
+---
+
 ## 📄 License
 
 Private / Proprietary. All rights reserved - SchwartZ.
-
----
 
 <div align="center">
 
