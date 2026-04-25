@@ -14,7 +14,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)]()
 
 > **Private. Local. Institutional-grade.**  
-> Real-time candlestick charting · 16 technical indicators · 5-agent AI consensus · Options analytics · Probability engine · News intelligence · AI stock screener — all running on your own hardware.
+> Real-time candlestick charting · 24 technical indicators · 5-agent AI consensus · Options analytics · Probability engine · News intelligence · AI stock screener — all running on your own hardware.
 
 </div>
 
