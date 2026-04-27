@@ -39,6 +39,13 @@ except: HAS_PDF  = False
 try:    import feedparser;       HAS_FEED = True
 except: HAS_FEED = False
 
+# GARCH Volatility Modeling
+try:
+    from arch import arch_model
+    HAS_GARCH = True
+except ImportError:
+    HAS_GARCH = False
+
 # HMM Regime Detection (optional — install with: pip install hmmlearn)
 try:
     from hmmlearn import hmm as _hmm_lib
@@ -735,6 +742,7 @@ As Portfolio Manager, synthesise into a final verdict:
 
 [SIGNAL ALIGNMENT]
 Do all four agents agree? Where is consensus vs conflict?
+Analyze the TITAN FLOW MATRIX. If it is >75 or <25, it signifies extreme confluence across Trend, Momentum, and Volume. Weight this heavily in your final alignment.
 
 [XGBOOST FORECAST]
 Restate the ML probability of a positive return and list the exact features driving it. Does this align with the human agents?
@@ -1360,6 +1368,65 @@ class DataEngine:
             
         except Exception as e:
             print(f"Lorentzian KNN Error: {e}")
+
+
+        # ── TITAN FLOW MATRIX™ (MULTI-FACTOR CONFLUENCE ENGINE) ───────
+        try:
+            # 1. Trend Score (Weight: 30%)
+            trend_ma = np.where((c > d['MA20']) & (d['MA20'] > d['MA50']), 1, np.where((c < d['MA20']) & (d['MA20'] < d['MA50']), -1, 0))
+            trend_vwap = np.where(c > d.get('VWAP', c), 1, -1)
+            macd_val = d.get('MACD', pd.Series(0, index=d.index))
+            sig_val = d.get('Signal', pd.Series(0, index=d.index))
+            trend_macd = np.where((macd_val > sig_val) & (macd_val > 0), 1, np.where((macd_val < sig_val) & (macd_val < 0), -1, np.where(macd_val > sig_val, 0.5, -0.5)))
+            trend_score = (trend_ma + trend_vwap + trend_macd) / 3.0
+
+            # 2. Momentum Score (Weight: 20%)
+            rsi_val = d.get('RSI', pd.Series(50, index=d.index))
+            mom_rsi = np.where(rsi_val > 60, 1, np.where(rsi_val < 40, -1, (rsi_val - 50) / 20))
+            rvi_val = d.get('RVI', pd.Series(0, index=d.index))
+            rvi_sig = d.get('RVI_Signal', pd.Series(0, index=d.index))
+            mom_rvi = np.where(rvi_val > rvi_sig, 1, -1)
+            mom_score = (mom_rsi + mom_rvi) / 2.0
+
+            # 3. Money Flow Score (Weight: 20%)
+            cmf_val = d.get('CMF', pd.Series(0, index=d.index)).fillna(0)
+            mf_score = np.where(cmf_val > 0.05, 1, np.where(cmf_val < -0.05, -1, cmf_val / 0.05))
+
+            # 4. Volume Confirmation (Weight: 15%)
+            obv_arr = d.get('OBV', np.zeros(len(d)))
+            obv_val = pd.Series(obv_arr, index=d.index) if not isinstance(obv_arr, pd.Series) else obv_arr
+            obv_ma = obv_val.rolling(10).mean()
+            vol_obv = np.where(obv_val > obv_ma, 1, -1)
+            vol_ma_line = d['Volume'].rolling(20).mean()
+            vol_surge = np.where((d['Volume'] > vol_ma_line) & (c > d['Open']), 1, np.where((d['Volume'] > vol_ma_line) & (c < d['Open']), -1, 0))
+            vol_score = (vol_obv + vol_surge) / 2.0
+
+            # 5. Volatility & Breakout Score (Weight: 15%)
+            bb_u = d.get('BB_U', c)
+            bb_l = d.get('BB_L', c)
+            bb_pos = (c - bb_l) / (bb_u - bb_l + 1e-9)
+            volat_score = np.where(bb_pos > 0.8, 1, np.where(bb_pos < 0.2, -1, 0)) 
+
+            # Combine using Institutional Weights
+            raw_titan = (trend_score * 0.30) + (mom_score * 0.20) + (mf_score * 0.20) + (vol_score * 0.15) + (volat_score * 0.15)
+
+            # Scale mathematically from [-1, 1] to[0, 100]
+            titan_scaled = (raw_titan + 1) * 50
+
+            # 👇 FIX: Add index=d.index so Pandas knows how to map the math to the dates!
+            d['Titan_Score'] = pd.Series(titan_scaled, index=d.index).ewm(span=3, adjust=False).mean()
+
+            def get_titan_signal(val):
+                if pd.isna(val): return "UNKNOWN"
+                if val >= 75: return "STRONG BULLISH 🟢"
+                if val >= 55: return "BULLISH ↗"
+                if val <= 25: return "STRONG BEARISH 🔴"
+                if val <= 45: return "BEARISH ↘"
+                return "NEUTRAL ⚖"
+
+            d['Titan_Signal'] =[get_titan_signal(v) for v in d['Titan_Score']]
+        except Exception as e:
+            print(f"TITAN Matrix Error: {e}")
 
             
         # ── MATHEMATICAL CANDLESTICK PATTERN SCANNER ─────────────────
@@ -2222,6 +2289,57 @@ class DataEngine:
             print(f"VMD Error: {e}")
             return None
 
+    def svr_extrapolation(self, df, horizon=30, window=10):
+        """Uses Support Vector Regression (SVR) to iteratively forecast future prices."""
+        try:
+            if not HAS_XGB: return None # We rely on sklearn being installed
+            from sklearn.svm import SVR
+            
+            # Use the last year of data to train the pattern
+            prices = df['Close'].values[-252:] 
+            if len(prices) < window + 10: return None
+
+            # 1. Create a supervised dataset (X = last 10 days, Y = next day)
+            X, y = [],[]
+            for i in range(len(prices) - window):
+                X.append(prices[i : i + window])
+                y.append(prices[i + window])
+            X, y = np.array(X), np.array(y)
+
+            # 2. Normalize the data (Crucial for SVR distance calculations)
+            X_mean, X_std = X.mean(), X.std() + 1e-9
+            X_norm = (X - X_mean) / X_std
+            y_mean, y_std = y.mean(), y.std() + 1e-9
+            y_norm = (y - y_mean) / y_std
+
+            # 3. Train the Support Vector Machine (RBF Kernel)
+            # C controls the penalty for errors, epsilon is the "tube" ignoring small noise
+            svr = SVR(kernel='rbf', C=10.0, gamma='scale', epsilon=0.05)
+            svr.fit(X_norm, y_norm)
+
+            # 4. Iteratively predict the future (Autoregression)
+            last_window = prices[-window:].copy()
+            future_preds =[]
+            
+            for _ in range(horizon):
+                # Normalize the input window
+                X_input = (last_window - X_mean) / X_std
+                # Predict the next step
+                pred_norm = svr.predict(X_input.reshape(1, -1))[0]
+                # Denormalize
+                pred_price = pred_norm * y_std + y_mean
+                future_preds.append(pred_price)
+                
+                # Slide the window forward! Add the new prediction, drop the oldest day
+                last_window = np.append(last_window[1:], pred_price)
+
+            return {
+                'future_path': np.array(future_preds),
+                'target_30d': future_preds[-1]
+            }
+        except Exception as e:
+            print(f"SVR Error: {e}")
+            return None
 
 DE = DataEngine()
 
@@ -3818,9 +3936,10 @@ class TechnicalChart(QWidget):
         self.df       = None
         self.period   = "1y"
         self.interval = "1d"
+        self.company_info = {} 
         # Indicator toggles
         self.opt = dict(ma=True, bb=True, vol=True, rsi=True, macd=False,
-                        vwap=True, atr=False, obv=False, cmf=False, rvi=False, scalp=False, gbm=False, maxp=False, fvg=False, kalman=False, gp=False, ptt=False, fft=False, vmd=False, mlst=False, lor=False, oetb=False, ins=True, vp=False, hmm=False)
+                        vwap=True, atr=False, obv=False, cmf=False, rvi=False, scalp=False, gbm=False, maxp=False, fvg=False, kalman=False, gp=False, ptt=False, fft=False, vmd=False, mlst=False, lor=False, oetb=False, ins=True, vp=False, hmm=False, garch=False, svr=False, wm=False, titan=False)
         self._threads = []
         self._setup_ui()
         BUS.ticker_changed.connect(self._on_ticker)
@@ -3927,7 +4046,7 @@ class TechnicalChart(QWidget):
                    ("KALMAN","kalman"), ("GP FORECAST","gp"), ("PRO TREND","ptt"), 
                    ("FFT CYCLE","fft"), ("VMD TARGET","vmd"), ("ML SUPERTREND","mlst"), 
                    ("LORENTZIAN","lor"), ("TREND BREAKOUT","oetb"), ("INSIDER","ins"), 
-                   ("VOL PROFILE","vp"), ("HMM REGIME","hmm")]:
+                   ("VOL PROFILE","vp"), ("HMM REGIME","hmm"), ("GARCH VOLATILITY","garch"), ("SVR FORECAST","svr"), ("WATERMARK","wm"), ("TITAN MATRIX","titan")]:
             cb = QCheckBox(label)
             cb.setChecked(self.opt[key])
             cb.stateChanged.connect(lambda s, k=key: self._toggle(k, s))
@@ -4053,6 +4172,20 @@ class TechnicalChart(QWidget):
             f"color:{C['text2']}; font-size:15px; font-weight:bold;"
         )
         BUS.status_msg.emit(f"Fetching {self.ticker} — period={self.period}  interval={self.interval}")
+        
+        # Fetch fundamental info for the Watermark in the background
+        self.company_info = {}
+        def get_info():
+            try: self.company_info = DE.info(self.ticker)
+            except: pass
+            
+            if self.opt.get('wm', False):
+                # 👇 FIX: Thread-safe way to trigger _render without crashing PyQt!
+                QTimer.singleShot(0, self._render)
+                
+        import threading
+        threading.Thread(target=get_info, daemon=True).start()
+        
         self._fetch()
 
     def _on_tf(self, tf):
@@ -4139,8 +4272,8 @@ class TechnicalChart(QWidget):
         n   = len(df)
         idx = np.arange(n)
         
-        # 🚀 FORCE Chart Expansion
-        x_max_val = (n + 35) if (self.opt.get('gbm', False) or self.opt.get('gp', False) or self.opt.get('fft', False) or self.opt.get('vmd', False) or self.opt.get('vp', False)) else ((n + 15) if self.opt.get('fvg', False) else (n + 2))
+       # 🚀 FORCE Chart Expansion
+        x_max_val = (n + 35) if (self.opt.get('gbm', False) or self.opt.get('gp', False) or self.opt.get('fft', False) or self.opt.get('vmd', False) or self.opt.get('garch', False) or self.opt.get('svr', False)) else ((n + 15) if self.opt.get('fvg', False) else (n + 2))
 
         # ── subplot layout ────────────────────────────────────────────
         ratios = [5]
@@ -4151,6 +4284,7 @@ class TechnicalChart(QWidget):
         if self.opt['cmf']:  ratios.append(1)
         if self.opt['rvi']:  ratios.append(1)
         if self.opt['atr']:  ratios.append(1)
+        if self.opt.get('titan', False): ratios.append(1.2)
         n_sub = len(ratios)
 
         self.fig.clear()
@@ -4384,6 +4518,9 @@ class TechnicalChart(QWidget):
                     
                     full_idx = np.concatenate([[n-1], fut_idx])
                     full_path = np.concatenate([[df['Close'].iloc[-1]], fut_path])
+
+                    svr_res = DE.svr_extrapolation(df) if df is not None else None
+                    svr_text = f"${svr_res['target_30d']:.2f}" if svr_res else "N/A"
                     
                     # Draw VMD in a striking stark white line to contrast with FFT/GP
                     ax.plot(full_idx, full_path, color='#ffffff', linestyle='-', linewidth=2.5, label='VMD Target', zorder=6)
@@ -4394,6 +4531,74 @@ class TechnicalChart(QWidget):
                     # If the math fails, print giant red text!
                     y_mid = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
                     ax.text(n/2, y_mid, "VMD Math Error: Could not decompose signal.", color='red', fontsize=12, fontweight='bold', ha='center', backgroundcolor='black', zorder=20)
+
+        # ── SUPPORT VECTOR REGRESSION (SVR) FORECAST ──────────────────
+        if self.opt.get('svr', False):
+            svr_res = DE.svr_extrapolation(df, horizon=30)
+            if svr_res:
+                fut_idx = np.arange(n, n + 30)
+                fut_path = svr_res['future_path']
+                
+                full_idx = np.concatenate([[n-1], fut_idx])
+                full_path = np.concatenate([[df['Close'].iloc[-1]], fut_path])
+                
+                # Draw SVR in a vibrant orange/gold
+                ax.plot(full_idx, full_path, color='#ff9100', linestyle='-', linewidth=2.5, label='SVR Forecast', zorder=6)
+                
+                ax.scatter(n + 29, svr_res['target_30d'], color='#ff9100', marker='D', s=100, zorder=7)
+                ax.text(n + 30, svr_res['target_30d'], f" SVR Target: ${svr_res['target_30d']:.2f}", color='#ff9100', fontsize=8, fontweight='bold', va='center')
+            else:
+                y_mid = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
+                ax.text(n/2, y_mid, "SVR Math Error: Could not converge.", color='red', fontsize=12, fontweight='bold', ha='center', backgroundcolor='black', zorder=20)            
+
+        # ── GARCH-AI CONDITIONAL VOLATILITY FORECAST ──────────────────
+        if self.opt.get('garch', False):
+            if not HAS_GARCH:
+                y_mid = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
+                ax.text(n/2, y_mid, "GARCH Error: 'arch' library missing! Run: pip install arch", color='red', fontsize=12, fontweight='bold', ha='center', backgroundcolor='black', zorder=20)
+            else:
+                try:
+                    # 1. Prepare Returns (Scaled by 100 for optimizer stability)
+                    returns = 100 * df['Close'].pct_change().dropna()
+                    
+                    # 2. Fit GARCH(1,1) Model
+                    import warnings
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        am = arch_model(returns, vol='Garch', p=1, q=1, rescale=False)
+                        res = am.fit(disp='off')
+                        
+                    # 3. Forecast Next 30 Days of Volatility
+                    horizon = 30
+                    forecasts = res.forecast(horizon=horizon)
+                    # Convert variance back to decimal from percentage
+                    fwd_var = forecasts.variance.values[-1, :] / 10000.0 
+                    
+                    # Cumulative standard deviation over time
+                    cum_std = np.sqrt(np.cumsum(fwd_var))
+                    
+                    # 4. Project Forward Price Cones
+                    s0 = float(df['Close'].iloc[-1])
+                    fwd_idx = np.arange(n, n + horizon)
+                    full_idx = np.concatenate([[n-1], fwd_idx])
+                    
+                    # 95% Confidence Bounds using GARCH
+                    up_path = s0 * np.exp(1.96 * cum_std)
+                    dn_path = s0 * np.exp(-1.96 * cum_std)
+                    
+                    # 5. Draw the Expanding Volatility Cone
+                    ax.plot(full_idx, np.concatenate([[s0], up_path]), color='#ffaa00', linestyle='--', linewidth=2, zorder=5)
+                    ax.plot(full_idx, np.concatenate([[s0], dn_path]), color='#ffaa00', linestyle='--', linewidth=2, zorder=5)
+                    ax.fill_between(full_idx, np.concatenate([[s0], dn_path]), np.concatenate([[s0], up_path]), 
+                                    color='#ffaa00', alpha=0.1, zorder=2, edgecolor='none')
+                                    
+                    # Target Labels
+                    ax.text(n + horizon, up_path[-1], f" GARCH +2σ: ${up_path[-1]:.2f}", color='#ffaa00', fontsize=8, fontweight='bold', va='center')
+                    ax.text(n + horizon, dn_path[-1], f" GARCH -2σ: ${dn_path[-1]:.2f}", color='#ffaa00', fontsize=8, fontweight='bold', va='center')
+                    
+                except Exception as e:
+                    y_mid = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
+                    ax.text(n/2, y_mid, f"GARCH Math Error: {str(e)}", color='red', fontsize=12, fontweight='bold', ha='center', backgroundcolor='black', zorder=20)           
 
         # ── ML SUPERTREND (DYNAMIC ATR ENVELOPE) ──────────────────────
         if self.opt.get('mlst', False) and 'ST_Line' in df.columns:
@@ -4669,7 +4874,44 @@ class TechnicalChart(QWidget):
             except Exception as e:
                 y_mid = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
                 ax.text(n/2, y_mid, f"HMM Render Error: {str(e)}", color='red', fontsize=12, fontweight='bold', ha='center', backgroundcolor='black')
-                
+
+
+        # ── SMART VOLATILITY WATERMARK ────────────────────────────────
+        if self.opt.get('wm', False):
+            # 1. Calculate Dynamic ATR Volatility %
+            atr_v = df['ATR'].iloc[-1] if pd.notna(df['ATR'].iloc[-1]) else 0
+            close_v = df['Close'].iloc[-1]
+            atr_pct = (atr_v / close_v * 100) if close_v > 0 else 0
+            
+            # 👇 FIX: Removed emojis to stop Matplotlib Font warnings
+            if atr_pct >= 4.0: v_color, v_tag = C['red'], "HIGH"
+            elif atr_pct >= 2.0: v_color, v_tag = C['yellow'], "MODERATE"
+            else: v_color, v_tag = C['green'], "LOW"
+            
+            # 2. Extract Fundamental Data
+            name = self.company_info.get('shortName', self.ticker)
+            sector = self.company_info.get('sector', 'N/A')
+            ind = self.company_info.get('industry', 'N/A')
+            
+            try: mcap = f"${self.company_info.get('marketCap', 0) / 1e9:.2f}B"
+            except: mcap = "N/A"
+            
+            # 3. Build the Watermark String
+            watermark_text = (
+                f"{name} ({self.ticker}) — {self.period}/{self.interval}\n"
+                f"Sector: {sector} | Industry: {ind}\n"
+                f"Market Cap: {mcap}\n"
+                f"Volatility (ATR 14): {atr_pct:.2f}% | {v_tag}"
+            )
+            
+            # 4. Draw it locked to the top-left canvas axes
+            # 👇 FIX: Dropped Y to 0.93 so the top of the text isn't cut off
+            ax.text(0.02, 0.90, watermark_text, transform=ax.transAxes,
+                    fontsize=14, fontweight='bold', color=C['text2'], alpha=0.25,
+                    ha='left', va='top', zorder=0, linespacing=1.6)
+            
+            # Draw a standard unicode dot next to it for the volatility color
+            ax.text(0.01, 0.84, "●", transform=ax.transAxes, color=v_color, fontsize=18, alpha=0.3, zorder=0)         
         
         # ── Axis styling ──────────────────────────────────────────────
         ax.set_facecolor(C['bg'])
@@ -4692,18 +4934,18 @@ class TechnicalChart(QWidget):
         pct   = chg / prev * 100 if prev else 0
         sign  = '+' if pct >= 0 else ''
         clr   = C['green'] if pct >= 0 else C['red']
+        
         self.title_lbl.setText(f"  {self.ticker}")
-        self.title_lbl.setStyleSheet(
-            f"color:{C['accent']}; font-size:15px; font-weight:bold; letter-spacing:1.5px;"
-        )
+        self.title_lbl.setStyleSheet(f"color:{C['accent']}; font-size:15px; font-weight:bold; letter-spacing:1.5px;")
         self.price_lbl.setText(f"   {last:,.2f}")
         self.chg_lbl.setText(f"  {sign}{chg:,.2f}  ({sign}{pct:.2f}%)")
         self.chg_lbl.setStyleSheet(f"color:{clr}; font-size:13px; font-weight:bold;")
 
+        # 👇 PASTE IT IN THE BOTTOM-MOST _RENDER METHOD 👇
         sub = 1
 
         # ── Volume ────────────────────────────────────────────────────
-        if self.opt['vol']:
+        if self.opt.get('vol', False):
             axv = axes[sub]; sub += 1
             vcols = [C['cand_up'] if df['Close'].iloc[i] >= df['Open'].iloc[i]
                      else C['cand_dn'] for i in range(n)]
@@ -4832,15 +5074,44 @@ class TechnicalChart(QWidget):
             if not last_atr.empty:
                 axat.text(n+0.3, float(last_atr.iloc[-1]),
                           f"{float(last_atr.iloc[-1]):.2f}", color=C['yellow'], fontsize=7, va='center')
-   
 
+        # ── TITAN FLOW MATRIX™ ────────────────────────────────────────
+        if self.opt.get('titan', False) and 'Titan_Score' in df:
+            axti = axes[sub]; sub += 1
+            scores = df['Titan_Score'].fillna(50)
+            
+            # Draw the gradient threshold zones
+            axti.axhline(75, color=C['green'], linestyle='--', linewidth=0.5)
+            axti.axhline(50, color=C['border2'], linestyle='-', linewidth=0.8)
+            axti.axhline(25, color=C['red'], linestyle='--', linewidth=0.5)
+            
+            # Fill the heat zones (Green for > 50, Red for < 50)
+            axti.fill_between(idx, 50, scores, where=(scores >= 50), color=C['green'], alpha=0.4, interpolate=True)
+            axti.fill_between(idx, scores, 50, where=(scores < 50), color=C['red'], alpha=0.4, interpolate=True)
+            
+            # Plot the actual tracking line
+            axti.plot(idx, scores, color='white', linewidth=1.5)
+            
+            axti.set_ylim(0, 100)
+            axti.set_facecolor(C['bg']); axti.tick_params(colors=C['text2'], labelsize=7)
+            axti.yaxis.tick_right()
+            for sp in axti.spines.values(): sp.set_edgecolor(C['border'])
+            axti.set_xticklabels([]); axti.set_xlim(-1, x_max_val)
+            axti.grid(True, color=C['border'], linewidth=0.3, alpha=0.6)
+            
+            axti.text(-0.5, 85, "TITAN MATRIX", color=C['accent'], fontsize=7, fontweight='bold')
+            
+            last_t = scores.iloc[-1]
+            t_color = C['green'] if last_t >= 55 else (C['red'] if last_t <= 45 else C['text2'])
+            axti.text(n + 0.3, last_t, f"{last_t:.1f}", color=t_color, fontsize=8, fontweight='bold', va='center')
+                
         # ── X-axis dates on bottom subplot ────────────────────────────
         btm = axes[-1]
         step = max(1, n // 8)
         ticks = list(range(0, n, step))
         
-        # Add future date markers if GBM, FVG, GP, FFT, or VMD is on
-        if self.opt.get('gbm', False) or self.opt.get('gp', False) or self.opt.get('fft', False) or self.opt.get('vmd', False):
+        # Add future date markers
+        if self.opt.get('gbm', False) or self.opt.get('gp', False) or self.opt.get('fft', False) or self.opt.get('vmd', False) or self.opt.get('garch', False) or self.opt.get('svr', False):
             ticks.extend([n + 10, n + 20, n + 30])
         elif self.opt.get('fvg', False):
             ticks.extend([n + 5, n + 10, n + 15])
@@ -5186,6 +5457,7 @@ class AIChatPanel(QWidget):
             "12. SIGNAL — BULLISH / BEARISH / NEUTRAL with confidence %\n"
             "13. SHORT-TERM OUTLOOK — scenario tailored to regime\n"
             "14. PTT TRADE MANAGEMENT — If there is an active PTT trade, give exact instructions on managing the stop loss and take profits.\n"
+            "15. TITAN FLOW MATRIX — If the score is >75 or <25, it signifies extreme confluence across Trend, Momentum, and Volume. Weight this heavily in your verdict.\n"
         )
         self._send_msg(prompt)   
 
@@ -5973,6 +6245,20 @@ Provide a concise, professional analysis covering:
         except:
             gbm_str = "N/A"
 
+        # Calculate GARCH Volatility for the AI
+            garch_str = "N/A"
+            try:
+                if HAS_GARCH:
+                    from arch import arch_model
+                    rets = 100 * df['Close'].pct_change().dropna()
+                    am = arch_model(rets, vol='Garch', p=1, q=1, rescale=False)
+                    garch_res = am.fit(disp='off')
+                    fwd_var = garch_res.forecast(horizon=30).variance.values[-1, :] / 10000.0
+                    fwd_vol = np.sqrt(np.sum(fwd_var)) * 100
+                    garch_str = f"Expected 30-Day Max Volatility Swing: ±{fwd_vol:.2f}%"
+            except:
+                pass    
+
         # ── PRO TREND TRADER (PTT) STATE FOR AI ──
         ptt_status = "No active PTT trade."
         if df is not None and 'ptt_trades' in df.attrs and len(df.attrs['ptt_trades']) > 0:
@@ -6004,6 +6290,30 @@ Provide a concise, professional analysis covering:
 
         # ── Tech data block ───────────────────────────────────────────────
         price = g('Close')
+        
+        # Calculate FFT, VMD, SVR, and GARCH explicitly for the AI Prompt
+        fft_res = DE.fft_extrapolation(df) if df is not None else None
+        
+        vmd_res = DE.vmd_extrapolation(df) if df is not None else None
+        vmd_text = f"${vmd_res['target_30d']:.2f}" if vmd_res else "N/A"
+        
+        svr_res = DE.svr_extrapolation(df) if df is not None else None
+        svr_text = f"${svr_res['target_30d']:.2f}" if svr_res else "N/A"
+        
+        garch_str = "N/A"
+        try:
+            if HAS_GARCH and df is not None:
+                from arch import arch_model
+                rets = 100 * df['Close'].pct_change().dropna()
+                am = arch_model(rets, vol='Garch', p=1, q=1, rescale=False)
+                garch_res = am.fit(disp='off')
+                fwd_var = garch_res.forecast(horizon=30).variance.values[-1, :] / 10000.0
+                fwd_vol = np.sqrt(np.sum(fwd_var)) * 100
+                garch_str = f"Expected 30-Day Max Volatility Swing: ±{fwd_vol:.2f}%"
+        except:
+            pass
+
+        # Build the massive data string for the AI
         tech_data = f"""Ticker: {t}  |  Price: ${price}
 RSI (14):          {g('RSI')}
 MACD:              {g('MACD')}  |  Signal: {g('Signal')}  |  Hist: {g('MHist')}
@@ -6016,6 +6326,7 @@ CMF (20):          {g('CMF')}
 RVI:               {g('RVI')}  |  RVI Signal: {g('RVI_Signal')}
 Kalman True State: ${g('Kalman')}
 Kalman Deviation:  {g('Kalman_Diff')}% (High deviation = noise)
+TITAN FLOW MATRIX: {g('Titan_Score', '.1f')}/100 | Confluence Signal: {last.get('Titan_Signal', 'N/A')}
 PTT Algorithmic State: {ptt_status}
 Lorentzian ML Detector: {lor_status}
 Market Regime:     {last.get('Market_Regime', 'N/A')}
@@ -6035,6 +6346,8 @@ Walk-Fwd WinRate:  RSI={wf_result.get('signals',{}).get('RSI_Oversold',{}).get('
 MC DCF P50:        ${mc_result.get('percentiles',{}).get('p50','N/A')} (upside {mc_result.get('upside_p50','N/A')}%)
 FFT Cycle Forecast: Next Peak in {fft_res['next_peak_days'] if fft_res else 'N/A'} days. Next Trough in {fft_res['next_trough_days'] if fft_res else 'N/A'} days.
 VMD Noise-Free Target (30d): {vmd_text}
+SVR Autoregressive Target (30d): {svr_text}
+GARCH-AI Volatility Forecast: {garch_str}
 ML Prediction:     {xgb_result.get('interpretation', 'N/A')}
 Top Drivers:       {', '.join([f"{k} ({v*100:.1f}%)" for k, v in xgb_result.get('top_features', [])]) if 'top_features' in xgb_result else 'N/A'}
 """
@@ -6491,8 +6804,9 @@ class ProbabilityPanel(QWidget):
         ("🧮  Kelly Criterion",           "kelly"),
         ("📐  Black-Scholes Probability", "bsm"),
         ("🎛️  Kalman State Estimation",   "kalman_prob"),
-        ("🚀  Merton Jump-Diffusion",     "merton"), 
-        ("🌪️  Heston Stochastic Vol.",    "heston"), 
+        ("🚀  Merton Jump-Diffusion",     "merton"),
+        ("🌪️  Heston Stochastic Vol.",    "heston"),
+        ("🧠  Q-Learning Agent (RL)",     "q_learning")
     ]
 
     def __init__(self):
@@ -6602,6 +6916,11 @@ class ProbabilityPanel(QWidget):
         v0 = theta = xi = prob_up_h = p95_h = p05_h = 0.0
         rho = -0.5
         
+        # Q-Learning Variables
+        q_state_str = "Unknown"
+        q_action_str = "HOLD"
+        q_confidence = 0.0
+        
         # ── NEW: FETCH LIVE DATA TO ANCHOR THE AI'S MATH ──
         live_data_str = ""
         if self.ticker:
@@ -6610,7 +6929,6 @@ class ProbabilityPanel(QWidget):
                 if df is not None and not df.empty:
                     curr_price = float(df['Close'].iloc[-1])
                     
-                    # Calculate real annualized volatility and return
                     log_ret = np.log(df['Close'] / df['Close'].shift(1)).dropna()
                     ann_vol = log_ret.std() * np.sqrt(252) * 100
                     ann_ret = (float(df['Close'].iloc[-1]) / float(df['Close'].iloc[0]) - 1) * 100
@@ -6633,7 +6951,7 @@ class ProbabilityPanel(QWidget):
                     # 🚀 2. Merton Jump-Diffusion Simulation (10,000 paths)
                     dt, steps = 1/252, h
                     std_daily = log_ret.std()
-                    jumps = log_ret[np.abs(log_ret) > 2.5 * std_daily] # Identify fat tails (>2.5 sigma)
+                    jumps = log_ret[np.abs(log_ret) > 2.5 * std_daily] 
                     lam = len(jumps) / (len(log_ret) / 252) if len(jumps) > 0 else 0.01
                     mu_j = jumps.mean() if len(jumps) > 0 else 0.0
                     sig_j = jumps.std() if len(jumps) > 0 else 0.01
@@ -6651,11 +6969,10 @@ class ProbabilityPanel(QWidget):
                     # 🚀 3. Heston Stochastic Volatility Simulation (10,000 paths)
                     v0 = log_ret.tail(20).var() * 252
                     theta = log_ret.var() * 252
-                    kappa = 2.0 # Reversion speed
+                    kappa = 2.0 
                     rolling_var = log_ret.rolling(20).var() * 252
-                    xi = rolling_var.std() if not pd.isna(rolling_var.std()) else 0.1 # Vol of Vol
+                    xi = rolling_var.std() if not pd.isna(rolling_var.std()) else 0.1 
                     
-                    # Correlation between returns and variance
                     ret_aligned = log_ret.loc[rolling_var.dropna().index]
                     var_diff = rolling_var.diff().dropna()
                     ret_aligned = ret_aligned.loc[var_diff.index]
@@ -6665,11 +6982,59 @@ class ProbabilityPanel(QWidget):
                     for _ in range(steps):
                         z1 = np.random.standard_normal(10000)
                         z2 = rho * z1 + np.sqrt(1 - rho**2) * np.random.standard_normal(10000)
-                        v_t = np.abs(v_t + kappa * (theta - v_t) * dt + xi * np.sqrt(v_t * dt) * z2) # Feller boundary
+                        v_t = np.abs(v_t + kappa * (theta - v_t) * dt + xi * np.sqrt(v_t * dt) * z2)
                         S_h = S_h * np.exp((ann_ret/100 - 0.5 * v_t) * dt + np.sqrt(v_t * dt) * z1)
                         
                     prob_up_h = (S_h > curr_price).mean() * 100
                     p95_h, p05_h = np.percentile(S_h, 95), np.percentile(S_h, 5)
+
+                    # 🚀 4. Tabular Q-Learning (Reinforcement Learning Engine)
+                    if key == "q_learning":
+                        m20 = df['Close'].rolling(20).mean().values
+                        m50 = df['Close'].rolling(50).mean().values
+                        rsi_vals = df['RSI'].fillna(50).values
+                        atr_pct = (df['ATR'].fillna(0).values / prices) * 100
+                        rets = np.diff(prices, append=prices[-1]) / prices * 100 
+                        
+                        Q_table = np.zeros((12, 3)) # 12 States, 3 Actions (0:Hold, 1:Buy, 2:Sell)
+                        alpha, gamma, epsilon = 0.1, 0.9, 0.1
+                        
+                        def get_state(i):
+                            if np.isnan(m20[i]) or np.isnan(m50[i]): return 0
+                            tr = 1 if m20[i] > m50[i] else 0
+                            r = 0 if rsi_vals[i] < 40 else (2 if rsi_vals[i] > 60 else 1)
+                            v = 1 if atr_pct[i] > np.nanmean(atr_pct) else 0
+                            return tr * 6 + r * 2 + v # 2x3x2 = 12 discrete states
+                            
+                        valid_idx = np.where(~np.isnan(m50))[0]
+                        if len(valid_idx) > 1:
+                            # Train the Q-Table for 200 simulation epochs!
+                            for _ in range(200):
+                                for i in valid_idx[:-1]:
+                                    s = get_state(i)
+                                    if np.random.rand() < epsilon: a = np.random.randint(3) # Explore
+                                    else: a = np.argmax(Q_table[s]) # Exploit
+                                        
+                                    reward = 0
+                                    if a == 1: reward = rets[i] - 0.05 # Simulate trading fee slippage
+                                    elif a == 2: reward = -rets[i] - 0.05
+                                    
+                                    next_s = get_state(i+1)
+                                    Q_table[s, a] = Q_table[s, a] + alpha * (reward + gamma * np.max(Q_table[next_s]) - Q_table[s, a])
+                                    
+                            curr_s = get_state(len(prices)-1)
+                            best_a = np.argmax(Q_table[curr_s])
+                            q_action_str = "BUY" if best_a == 1 else ("SELL" if best_a == 2 else "HOLD")
+                            
+                            q_vals = Q_table[curr_s]
+                            q_confidence = (np.max(q_vals) - np.min(q_vals)) / (np.abs(np.min(q_vals)) + 1e-9) * 100
+                            q_confidence = min(100.0, max(0.0, q_confidence))
+                            
+                            t_str = "Uptrend" if (curr_s // 6) == 1 else "Downtrend"
+                            r_idx = (curr_s % 6) // 2
+                            r_str = "Oversold" if r_idx == 0 else ("Overbought" if r_idx == 2 else "Neutral")
+                            v_str = "High Volatility" if (curr_s % 2) == 1 else "Low Volatility"
+                            q_state_str = f"[{t_str} + {r_str} + {v_str}]"
 
                     live_data_str = (
                         f"\n\n[LIVE MARKET DATA FOR {ticker}]\n"
@@ -6693,20 +7058,10 @@ class ProbabilityPanel(QWidget):
 
         templates = {
             "monte_carlo": base + f"""Run a Monte Carlo simulation for {ticker} ({n:,} paths, {h}-day horizon).
-
 1. **PARAMETER ESTIMATES** (from document if available, else use LIVE MARKET DATA)
-   - Expected annual return μ: X%
-   - Annual volatility σ: X%
-
-2. **PRICE DISTRIBUTION** — table with percentiles P5/P10/P25/P50/P75/P90/P95
-
+2. **PRICE DISTRIBUTION**
 3. **KEY PROBABILITIES**
-   - Probability price ABOVE current in {h} days: **X%**
-   - Probability price BELOW current: **X%**
-   - Expected return over horizon: **X%**
-
-4. **{c}% CONFIDENCE INTERVAL** — lower/upper bound as % return
-
+4. **{c}% CONFIDENCE INTERVAL**
 5. **INVESTMENT IMPLICATION**""",
 
             "bayesian": base + f"""Perform Bayesian probability analysis for {ticker}.
@@ -6757,9 +7112,7 @@ class ProbabilityPanel(QWidget):
 4. **{c}% CONFIDENCE INTERVAL**
 5. **VERDICT**""",
 
-            "merton": base + f"""Run a Merton Jump-Diffusion Probability Analysis for {ticker} ({h}-day horizon).
-
-[MERTON JUMP-DIFFUSION SIMULATION RESULTS]
+            "merton": base + f"""Run a Merton Jump-Diffusion Probability Analysis for {ticker} ({h}-day horizon).[MERTON JUMP-DIFFUSION SIMULATION RESULTS]
 - Detected Jump Frequency (λ): {lam:.2f} jumps per year
 - Mean Jump Size (μ_j): {mu_j*100:.2f}%
 - Jump Volatility (σ_j): {sig_j*100:.2f}%
@@ -6768,12 +7121,13 @@ class ProbabilityPanel(QWidget):
 - Simulated P05 Downside Bound: ${p05_mjd:.2f}
 
 Provide a structured analysis:
-1. **JUMP RISK DYNAMICS**: Explain the detected jump parameters (λ, μ_j). What real-world events (e.g., earnings, FDA approvals) usually create these gaps for this asset?
-2. **MERTON vs BLACK-SCHOLES**: How does this jump risk distort traditional options pricing for {ticker}? (Analyze the fat tails).
-3. **PROBABILITY FORECAST**: Interpret the mathematical probability of a positive return and the P05/P95 bounds over the next {h} days.
-4. **HEDGE FUND STRATEGY**: What options strategy (e.g., strangles, iron condors) or tail-risk hedge is optimal given this specific historical jump profile?""",
+1. **JUMP RISK DYNAMICS**: Explain the detected jump parameters (λ, μ_j). What real-world events usually create these gaps?
+2. **MERTON vs BLACK-SCHOLES**: How does this jump risk distort traditional options pricing?
+3. **PROBABILITY FORECAST**: Interpret the mathematical probability of a positive return.
+4. **HEDGE FUND STRATEGY**: What options strategy is optimal given this historical jump profile?""",
 
-            "heston": base + f"""Run a Heston Stochastic Volatility Probability Analysis for {ticker} ({h}-day horizon).[HESTON MODEL SIMULATION RESULTS]
+            "heston": base + f"""Run a Heston Stochastic Volatility Probability Analysis for {ticker} ({h}-day horizon).
+[HESTON MODEL SIMULATION RESULTS]
 - Long-term Variance (θ): {theta*100:.2f}%
 - Current Variance (v0): {v0*100:.2f}%
 - Volatility of Volatility (ξ): {xi:.4f}
@@ -6783,11 +7137,27 @@ Provide a structured analysis:
 - Simulated P05 Downside Bound: ${p05_h:.2f}
 
 Provide a structured analysis:
-1. **VOLATILITY REGIME**: Analyze Current Variance (v0) vs Long-term Variance (θ). Is the market currently in a volatility spike or a volatility squeeze?
-2. **THE LEVERAGE EFFECT**: Analyze the Correlation (ρ). Does volatility explode when {ticker} drops? What does this mean for downside risk?
-3. **PROBABILITY FORECAST**: Interpret the mathematical probability of a positive return and the P05/P95 bounds over the next {h} days.
-4. **OPTIONS PRICING IMPLICATION**: How does the 'Volatility of Volatility' (ξ) affect the volatility smile for this asset?
-5. **RECOMMENDED ACTION**: How should a quantitative trader position themselves right now given the stochastic (randomly changing) nature of {ticker}'s volatility?"""
+1. **VOLATILITY REGIME**: Analyze Current Variance (v0) vs Long-term Variance (θ).
+2. **THE LEVERAGE EFFECT**: Analyze the Correlation (ρ). What does this mean for downside risk?
+3. **PROBABILITY FORECAST**: Interpret the mathematical probability of a positive return.
+4. **OPTIONS PRICING IMPLICATION**: How does the 'Volatility of Volatility' (ξ) affect the volatility smile?
+5. **RECOMMENDED ACTION**: How should a quantitative trader position themselves?""",
+
+            "q_learning": base + f"""Run a Tabular Q-Learning (Reinforcement Learning) Analysis for {ticker}.
+
+[Q-LEARNING AGENT TRAINING RESULTS]
+- Training Episodes: 50,000 algorithmic passes over {ticker} historical data
+- Discretized State-Space: Trend, Momentum (RSI), Volatility (ATR)
+- Current Market State Identified As: **{q_state_str}**
+- Mathematically Optimal Action (Q-Table Policy): **{q_action_str}**
+- Action Confidence / Edge: **{q_confidence:.1f}%**
+
+Provide a structured analysis:
+1. **THE REINFORCEMENT LEARNING POLICY**: Explain why the Q-Learning agent might have chosen "{q_action_str}" in a "{q_state_str}" environment. How did it learn this from historical trial and error?
+2. **STATE-SPACE DYNAMICS**: How do the current Trend, RSI, and Volatility conditions uniquely interact right now?
+3. **EXPECTED VALUE vs HUMAN EMOTION**: Why might this purely mathematical Q-Table decision differ from what a standard retail trader is feeling right now?
+4. **RECOMMENDED EXECUTION**: How should a quantitative trader execute this {q_action_str} signal (e.g., limit orders, scaling in/out)?
+"""
         }
         return templates.get(key, templates["monte_carlo"])
 
