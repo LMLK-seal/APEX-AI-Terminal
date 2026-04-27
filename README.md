@@ -14,7 +14,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)]()
 
 > **Private. Local. Institutional-grade.**  
-> Real-time candlestick charting · 26 technical indicators · 5-agent AI consensus · Options analytics · Probability engine · News intelligence · AI stock screener — all running on your own hardware.
+> Real-time candlestick charting · 28 technical indicators · 5-agent AI consensus · Options analytics · Probability engine · News intelligence · AI stock screener — all running on your own hardware.
 
 </div>
 
@@ -123,6 +123,8 @@ The primary analysis workspace. Bloomberg-style candlestick chart with real-time
 | Lorentzian  | Lorentzian Probability Detector | OFF | Using Machine Learning to measure the distance between the current market and historical "twins"|
 | ML SUPERTREND | Mt5 | OFF | An advanced SuperTrend that leverages Machine Learning for dynamic parameter optimization.|
 | WATERMARK | Smart Volatility Watermark | OFF | Provides the Company Name, Market Cap, Sector, and Dynamic Volatility (ATR %)|
+| SVR Forcast | Vector Regression | OFF | model looked at the last X days of movement, mapped them into a 4-dimensional space, and projected the most likely price path for the next 30 days|
+| GARCH  | GARCH-AI | OFF | GARCH is a mathematical model that predicts the future volatility|
 | TITAN FLOW MATRIX | Multi-Factor Confluence Model | OFF | condensed 10 different indicators into one, clean, easy-to-read Master Oscillator|
 | Insider | insider trading | ✅ ON | view the Insider Trading visually|
 
