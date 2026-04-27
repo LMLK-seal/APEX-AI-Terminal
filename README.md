@@ -122,6 +122,8 @@ The primary analysis workspace. Bloomberg-style candlestick chart with real-time
 | Pro Trand | Pro Trend Trader suite | OFF | Used to execute a single-day-trading-strategy, improves trading returns|
 | Lorentzian  | Lorentzian Probability Detector | OFF | Using Machine Learning to measure the distance between the current market and historical "twins"|
 | ML SUPERTREND | Mt5 | OFF | An advanced SuperTrend that leverages Machine Learning for dynamic parameter optimization.|
+| WATERMARK | Smart Volatility Watermark | OFF | Provides the Company Name, Market Cap, Sector, and Dynamic Volatility (ATR %)|
+| TITAN FLOW MATRIX | Multi-Factor Confluence Model | OFF | condensed 10 different indicators into one, clean, easy-to-read Master Oscillator|
 | Insider | insider trading | ✅ ON | view the Insider Trading visually|
 
 ---
