@@ -5139,6 +5139,47 @@ class TechnicalChart(QWidget):
         self.fig.subplots_adjust(left=0.01, right=0.93, top=0.97, bottom=0.04)
         self.canvas.draw()
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AI SENTIMENT METER THREAD
+# ═══════════════════════════════════════════════════════════════════════════════
+class SentimentEvalThread(QThread):
+    done_sig = pyqtSignal(dict)
+
+    def __init__(self, text):
+        super().__init__()
+        self.text = text[-3000:] 
+
+    def run(self):
+        prompt = f"""You are a quantitative text-analysis engine. Read the following financial analysis report and extract the final directional bias.
+
+[REPORT]
+{self.text}
+
+[INSTRUCTIONS]
+Calculate a Directional Bias Score from 0 to 100.
+0 = Maximum Bearish (Severe downtrend expected)
+50 = Neutral
+100 = Maximum Bullish (Strong uptrend expected)
+
+CRITICAL RULE: The score is a DIRECTIONAL INDEX, not a confidence percentage! If the report is highly bearish, the score MUST be a very low number (e.g., 10 or 15). Do not output high numbers for bearish reports.
+
+Output ONLY a raw JSON object. Do not use markdown.
+Format exactly like this:
+{{"score": 12, "bias": "STRONG BEARISH"}}"""
+        try:
+            response = ''.join(LM.stream([{"role": "user", "content": prompt}], system="Output valid JSON only.", temperature=0.0, max_tokens=100))
+            clean = response.replace("```json", "").replace("```", "").strip()
+            match = re.search(r'\{.*\}', clean, re.DOTALL)
+            if match:
+                data = json.loads(match.group(0))
+                self.done_sig.emit(data)
+            else:
+                self.done_sig.emit({'score': 50, 'bias': 'NEUTRAL (Parse Error)'})
+        except:
+            self.done_sig.emit({'score': 50, 'bias': 'NEUTRAL (Error)'})
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # AI CHAT PANEL
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -5575,6 +5616,7 @@ Look closely at the provided chart image and answer the following:
         cur.insertText(tok)
         self.display.setTextCursor(cur)
         self.display.ensureCursorVisible()
+        
     def _on_done(self):
         self._resp_open = False
         sep = f'<p style="color:{C["border2"]}">{"─"*36}</p>'
@@ -5605,8 +5647,15 @@ Look closely at the provided chart image and answer the following:
                 self.display.append(header)
                 self.display.append(rendered)
                 self.display.append(sep)
-            self.display.verticalScrollBar().setValue(
-                self.display.verticalScrollBar().maximum())
+            
+            # 👇 NEW: Trigger the Sentiment Evaluator!
+            self.display.append(f"<p style='color:{C['text3']}; font-style:italic; font-size:10px;'>⟳ Synthesizing Final Sentiment Score...</p>")
+            self.display.verticalScrollBar().setValue(self.display.verticalScrollBar().maximum())
+            
+            self._eval_thread = SentimentEvalThread(self._cur_resp)
+            self._eval_thread.done_sig.connect(self._on_eval_done)
+            self._eval_thread.start()
+            
         else:
             self.display.append(
                 f'<p style="color:{C["red"]}; font-size:11px;">'
@@ -5616,7 +5665,60 @@ Look closely at the provided chart image and answer the following:
                 "(3) try a shorter prompt.</p>"
             )
             self.display.append(sep)
-        BUS.status_msg.emit("Analysis complete")
+            BUS.status_msg.emit("Analysis complete")
+
+    def _on_eval_done(self, data):
+        score = data.get('score', 50)
+        try: score = float(score)
+        except: score = 50.0
+        
+        bias = data.get('bias', 'NEUTRAL').upper()
+        
+        # 🐛 FIX: The "LLM Confidence Confusion" Guardrail
+        # If the AI says it's Bearish but gives a high score, flip the math!
+        if 'BEAR' in bias and score > 50:
+            score = 100.0 - score
+        # Conversely, if it says Bullish but gives a low score, flip it back!
+        elif 'BULL' in bias and score < 50:
+            score = 100.0 - score
+            
+        # Determine Color Dynamic
+        if score >= 60: color = C['green']
+        elif score <= 40: color = C['red']
+        else: color = C['yellow']
+        
+        # Clamp score for HTML width safety
+        bar_width = max(1, min(99, score))
+        
+        # Build the Visual Meter using HTML tables
+        meter_html = f"""
+        <div style="background:{C['bg3']}; border:1px solid {color}; padding:10px; margin-top:8px; border-radius:4px;">
+            <p style="color:{color}; font-weight:bold; margin:0 0 6px 0; font-size:13px; letter-spacing:1px;">◈ AI CONFIDENCE METER: {bias} ({score:.0f}%)</p>
+            <table width="100%" height="12" cellspacing="0" cellpadding="0" style="background:{C['bg4']}; border:1px solid {C['border']};">
+                <tr>
+                    <td width="{bar_width}%" style="background:{color};"></td>
+                    <td width="{100 - bar_width}%"></td>
+                </tr>
+            </table>
+            <table width="100%" style="font-size:10px; color:{C['text2']}; margin-top:4px;">
+                <tr>
+                    <td align="left">BEAR (0)</td>
+                    <td align="center">NEUTRAL (50)</td>
+                    <td align="right">BULL (100)</td>
+                </tr>
+            </table>
+        </div>
+        """
+        sep = f'<p style="color:{C["border2"]}">{"─"*36}</p>'
+        
+        self.display.append(meter_html)
+        self.display.append(sep)
+        
+        # Auto-scroll to the bottom so the user sees the meter pop up
+        sb = self.display.verticalScrollBar()
+        sb.setValue(sb.maximum())
+        BUS.status_msg.emit("Analysis and Scoring complete")
+            
     # ── helpers ──────────────────────────────────────────────────────
     def _sys(self, text):
         self.display.append(
