@@ -1,0 +1,74 @@
+<script>
+  // Scena 2 - La fretta. Inserto sull'orologio ("Ore nove e quindici"), il Mouse arriva di corsa con il caffe' e frena
+  // derapando; "Mi copia...": lampo, una copia del Contratto salta fuori e il Mouse la trascina nello schermo;
+  // ChatGratis spunta dal portatile a braccia aperte; "Gratis. Che fortuna.": primo piano impassibile.
+  const tQ = W(0, "Qualcuno"), tF = W(0, "fretta"), tCopia = W(1, "copia"), tInc = W(1, "incolla"), tChat = W(1, "chatbot"), tGr = L[2].a;
+  const SCR = { x: 465, y: 602 };                                      // centro dello schermo del portatile
+  const CAM = [
+    [0, { x: 1470, y: 236, z: 2.3 }], [tQ - 0.06, { x: 1466, y: 238, z: 2.36 }, "none"],     // inserto: l'orologio
+    [tQ - 0.05, { x: 960, y: 560, z: 1.0 }, "none"],                                        // stacco sul campo largo
+    [tCopia, { x: 900, y: 560, z: 1.04 }, "power2.inOut"], [tChat + 0.4, { x: 760, y: 560, z: 1.08 }, "power2.inOut"],
+    [tGr - 0.11, { x: 760, y: 560, z: 1.08 }, "none"], [tGr - 0.1, { x: 1010, y: 640, z: 1.45 }, "none"],   // stacco: primo piano
+    [DUR, { x: 1004, y: 646, z: 1.5 }, "power1.inOut"],
+  ];
+  const KC = [   // il Contratto
+    [0, { x: 1000, y: 864, s: 1.22, by: -300, bc: 8, px: 0, py: 0, lid: 0.2, lx: -150, ly: -120, rx: 150, ry: -120, turn: 0, idleMouth: "rest" }],
+    [tQ + 0.2, { px: 1, py: -0.1, by: -308, bc: 14, lid: 0, turn: 0.2 }, "power2.out"],        // "Qualcuno ha fretta": guarda il Mouse
+    [tF + 0.4, { sq: 0.97 }], [tF + 0.55, { sq: 1.0 }],
+    [tCopia - 0.02, { sq: 1 }], [tCopia + 0.06, { sq: 0.86, by: -316, bc: 18, lx: -170, ly: -210, rx: 170, ry: -210 }, "power4.out"],   // il "clic" della copia
+    [tCopia + 0.3, { sq: 1.04 }, "back.out(2)"], [tCopia + 0.45, { sq: 1 }],
+    [tInc - 0.3, { px: -1, py: 0.2, turn: -0.3, bc: 22, by: -300, lx: -90, ly: -150, rx: 90, ry: -150 }, "power2.inOut"],   // segue la copia, preoccupato
+    [tChat, { px: -1, py: 0.3 }],
+    [tGr - 0.1, { px: 0, py: 0, turn: 0, lid: 0.52, bc: 0, bt: -2, by: -292, lx: -140, ly: -100, rx: 140, ry: -100, idleMouth: "flat" }, "none"],  // impassibile
+    [DUR, { lid: 0.55 }],
+  ];
+  const KM = [   // il Mouse frettoloso
+    [0, { x: 2250, y: 868, s: 0.95, r: -12, run: 1, px: -0.8, mouth: "grin", ct: 24 }],
+    [tQ, { x: 2250 }], [tF + 0.28, { x: 1440, r: 8, run: 0, ct: -14 }, "power2.out"],         // arriva e frena
+    [tF + 0.5, { r: -3, ct: 10 }, "back.out(2)"], [tF + 0.7, { r: 0, ct: 6 }],
+    [tCopia - 0.35, { lx: -130, ly: -150 }], [tCopia - 0.05, { lx: -330, ly: -200, lb: 0.2 }, "power3.out"],   // allunga la mano
+    [tCopia + 0.25, { lx: -250, ly: -260, lh: "point" }, "power2.out"],
+    [tInc + 0.2, { lx: -380, ly: -150, px: -1 }, "power2.inOut"],                                         // trascina verso lo schermo
+    [tChat + 0.3, { lx: -140, ly: -150, lh: "open", mouth: "smile", px: -0.6 }, "power2.out"],
+  ];
+  const KK = [   // la copia
+    [0, { o: 0, x: 1000, y: 864, s: 0.3, r: 0 }],
+    [tCopia, { o: 0 }], [tCopia + 0.02, { o: 1, x: 1000, y: 864, s: 0.5 }, "none"],
+    [tCopia + 0.32, { x: 1170, y: 760, s: 0.9, r: 8 }, "back.out(1.6)"],
+    [tInc - 0.15, { x: 1060, y: 620, s: 0.85, r: -10 }, "sine.inOut"],
+    [tInc + 0.25, { x: SCR.x, y: SCR.y + 40, s: 0.12, r: -340 }, "power3.in"], [tInc + 0.27, { o: 0 }, "none"],
+  ];
+  // ChatGratis: esce dallo schermo (lo schermo si gonfia, sale da dentro il display, salta) e si appollaia sul portatile
+  const PERCH = { x: 465, y: 650, s: 0.95 }, tOut = tChat - 0.3;
+  const KG = [
+    [0, { lx: -150, ly: -120, rx: 150, ry: -120, mouth: "O", lid: 0, px: 0, open: 1.2 }],
+    [tOut + 0.55, { lx: -215, ly: -268, rx: 212, ry: -268, mouth: "grin", lid: 0.42, px: 0.6, open: 1 }, "back.out(2)"],   // "Benvenuto!" a braccia aperte
+    [tGr + 0.9, { rx: 222, ry: -250, rh: "thumb", px: 1 }, "back.out(2)"],                                                 // "Che fortuna": pollice su
+  ];
+  const gratis = (t) => Anim.chatgratis(Anim.at(KG, t), t);
+  const flashes = [tCopia, tInc + 0.26];
+  const blinks = [tF + 1.0, tChat + 0.8];
+  const update = Anim.stage($("svg.stage"), Scenes.office({ fx: false }), Scenes.fx("warm"), (t) => {
+    const c = Anim.at(KC, t); c.blink = Anim.blinkAt(blinks, t); c.mouth = MOUTH(t, c.idleMouth);
+    const m = Anim.at(KM, t), k = Anim.at(KK, t);
+    if (m.run > 0.05) { m.stride = t * 22; m.y -= Math.abs(Math.sin(t * 11)) * 20 * m.run; }
+    let a = `<g transform="translate(1470,230)">${Props.secondHand(t + 13)}</g><g transform="translate(1600,642)">${Props.steam(t)}</g>`;
+    // schermo che "inghiotte" la copia
+    const fl = flashes.reduce((v, f) => Math.max(v, Math.max(0, 1 - Math.abs(t - f) / 0.12)), 0);
+    if (fl > 0) a += `<rect x="264" y="488" width="402" height="228" rx="6" fill="#fff" opacity="${fl * 0.9}"/>`;
+    a += Anim.genieOut(t, { t0: tOut, T: 1.0, style: "burst", color: "#ffd23f", perch: PERCH, render: gratis });
+    if (t > tOut + 1.0) a += [[-210, -470], [220, -500], [250, -300], [-240, -300]].map(([sx, sy], i) => { const u = Anim.clamp((t - tOut - 1.0 - i * 0.1) / 0.3);
+      return `<g transform="translate(${PERCH.x + sx * PERCH.s},${PERCH.y + sy * PERCH.s}) rotate(${t * 90 + i * 40}) scale(${PERCH.s * u * (0.8 + 0.2 * Math.sin(t * 6 + i))})">${Props.sparkle(16, i % 2 ? "#fff" : Chars.P.gratisPink)}</g>`; }).join("");
+    a += Anim.shadow({ ...c, ground: 864 }, 135);
+    a += Anim.place(Anim.contratto(c, t), c);
+    if (m.x < 2150) {
+      a += Anim.shadow({ ...m, ground: 868 }, 110);
+      if (m.run > 0.05) a += `<g transform="translate(${m.x + 150},${m.y - 40})">${Props.speedLines(3, 140 * m.run, 0.6)}</g>`;
+      a += Anim.place(Anim.mouse(m, t), m);
+    }
+    if (k.o > 0) a += `<g filter="url(#fxCopy)">${Anim.place(Anim.contratto({ px: -0.6, py: -0.2, open: 1.15, by: -312, bc: 16, mouth: "O", lx: -160, ly: -230, rx: 160, ry: -230, idle: 0 }, t), k)}</g>`;
+    if (fl > 0 && t < tCopia + 0.2) a += `<circle cx="1000" cy="640" r="${220 * (1 - fl) + 40}" fill="none" stroke="#fff" stroke-width="${10 * fl}" opacity="${fl}"/>`;
+    return { cam: Anim.at(CAM, t), actors: a };
+  });
+  Anim.drive(tl, DUR, update);
+</script>

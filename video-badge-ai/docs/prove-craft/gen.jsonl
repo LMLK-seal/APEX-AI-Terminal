@@ -1,0 +1,6 @@
+{"id":"file.newProject","params":{"name":"gen"}}
+{"id":"file.newSequence","params":{"name":"seq","width":1920,"height":1080,"fps":30}}
+{"id":"file.newColorMatte","params":{"color":"#e07a30","seconds":3}}
+{"id":"timeline.place","params":{"item":8,"track":"V1","seconds":0}}
+{"id":"file.exportMedia","params":{"path":"C:/Users/franc/progetto-p-Iva/video-badge-ai/docs/prove-craft/matte_test.mp4","format":"h264","wait":true}}
+{"id":"file.save","params":{"path":"C:/Users/franc/progetto-p-Iva/video-badge-ai/docs/prove-craft/gen.fcproj"}}

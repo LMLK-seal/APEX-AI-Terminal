@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Protezione finale · tre proposte</title>
+<style>
+  @font-face { font-family: "EB Garamond"; font-weight: 700; src: url(fonts/eb-garamond-latin-700-normal.woff2); }
+  @font-face { font-family: "Inter"; font-weight: 400; src: url(fonts/inter-latin-400-normal.woff2); }
+  @font-face { font-family: "Inter"; font-weight: 600; src: url(fonts/inter-latin-600-normal.woff2); }
+  @font-face { font-family: "Inter"; font-weight: 800; src: url(fonts/inter-latin-800-normal.woff2); }
+  @font-face { font-family: "IBM Plex Mono"; font-weight: 700; src: url(fonts/ibm-plex-mono-latin-700-normal.woff2); }
+  * { margin: 0; box-sizing: border-box; }
+  body { width: 2400px; background: #efe6d6; color: #1c2230; font-family: Inter; padding: 60px 80px 70px; }
+  h1 { font-family: "EB Garamond"; font-size: 72px; line-height: 1; }
+  .sub { font-size: 24px; color: #5d5a52; margin-top: 12px; }
+  .kicker { font-weight: 800; font-size: 18px; letter-spacing: .16em; text-transform: uppercase; color: #9a3f17; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 34px; }
+  .card { background: #f8f3ea; border-radius: 18px; padding: 22px; box-shadow: 0 2px 0 #d6c8ae, 0 18px 40px rgba(60,40,10,.12); }
+  .card.rec { outline: 6px solid #b5562a; }
+  .card h2 { font-family: "EB Garamond"; font-size: 42px; margin: 4px 0 4px; }
+  .card p { font-size: 20px; color: #5d5a52; line-height: 1.4; margin-bottom: 12px; min-height: 56px; }
+  svg { display: block; width: 100%; height: auto; border-radius: 10px; }
+</style>
+<script src="characters.js"></script><script src="chatbots.js"></script><script src="props.js"></script><script src="scenes.js"></script>
+</head>
+<body>
+  <div class="kicker">Sono un contratto · la protezione dell'azienda · alternative alla campana</div>
+  <h1>Tre proposte per la "bolla" finale</h1>
+  <div class="sub">Stesso fotogramma finale ("E io... resto a casa"), con il nuovo genio Assistente. Cambia solo la protezione.</div>
+  <div class="grid" id="grid"></div>
+<script>
+const { P, contratto, mouse } = Chars;
+const clips = `<defs><clipPath id="clipScreen-p"><rect x="264" y="488" width="402" height="228" rx="6"/></clipPath><clipPath id="clipAbove-p"><rect x="-2000" y="-3000" width="6000" height="3472"/></clipPath></defs>`;
+const genie = (() => { const g = `<g transform="translate(465,650) scale(.9)">${Chatbots.genieAssist({ mouth: "A", armR: [192, -344, -0.25, "thumb"] })}</g>`; return `<g clip-path="url(#clipScreen-p)">${g}</g><g clip-path="url(#clipAbove-p)">${g}</g>`; })();
+const shadow = (x, y, rx) => `<ellipse cx="${x}" cy="${y + 4}" rx="${rx}" ry="${rx * 0.15}" fill="#6b4a2a" opacity=".3"/>`;
+const cast = `${genie}
+  <g transform="translate(560,640)"><circle r="40" fill="${P.teal}" stroke="${P.ink}" stroke-width="5"/><path d="M-18,0 L-4,15 L20,-14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+  ${shadow(1290, 868, 72)}<g transform="translate(1290,868) scale(.72)">${mouse({ cap: true, sweat: false, mouth: "smile", eyes: { lid: 0.3, px: -0.6 } })}</g>
+  ${shadow(960, 864, 110)}<g transform="translate(960,820) scale(1.2)">${contratto({ mouth: "A", brow: { y: -310, curve: 18 }, eyes: { open: 0, happy: true }, armL: [-175, -265, 0.2], armR: [175, -265, -0.2] })}</g>
+  <g transform="translate(1680,470)">${Props.checklist({ checks: [1, 1, 1], lit: [1, 1, 1], w: 470, fs: 28 })}</g>`;
+const frame = (prot, fx) => `<svg viewBox="0 0 1920 1080">${clips}${Scenes.office({ fx: false, screen: "azienda", warm: 1.2 })}${cast}${prot}${Scenes.fx("warm")}
+  <g transform="translate(${960},${988})"><rect x="-200" y="-40" width="400" height="58" rx="10" fill="#101828" opacity=".62"/><text y="0" text-anchor="middle" font-family="Inter" font-weight="600" font-size="38" fill="#fbf6ec">E io... resto a casa.</text></g></svg>`;
+const OPT = [
+  ["A", "Casa pop-up di carta", "Pareti e tetto si alzano dalla scrivania come in un libro pop-up, con il camino che fuma e la targhetta AZIENDA. È letteralmente \"resto a casa\".", Props.house({ u: 1, glow: 1, r: 1400 }), true],
+  ["B", "Scudo", "Uno scudo verde petrolio con il lucchetto si apre attorno all'azienda come un campo di forza, partendo dal lucchetto dell'Assistente.", `<g transform="translate(770,520)">${Props.shield({ u: 1, glow: 1 })}</g>`, false],
+  ["C", "Bolla di sapone", "Una bolla trasparente dal bordo iridescente avvolge tutti e ondeggia leggera. Morbida e simpatica, molto \"cartone\".", `<g transform="translate(790,500)">${Props.bubble({ u: 1 })}</g>`, false],
+  ["—", "Per confronto: la campana di vetro", "La versione che non ti ha convinto.", `<g transform="translate(760,900)">${Props.belljar({ w: 620, h: 640, glow: 0.8, uid: "cmp" })}</g>`, false],
+];
+document.getElementById("grid").innerHTML = OPT.map(([k, n, d, prot, rec]) => `<div class="card${rec ? " rec" : ""}"><div class="kicker">${k === "—" ? "Prima versione" : "Proposta " + k}${rec ? " · consigliata" : ""}</div><h2>${n}</h2><p>${d}</p>${frame(prot)}</div>`).join("");
+</script>
+</body>
+</html>

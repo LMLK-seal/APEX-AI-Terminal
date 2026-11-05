@@ -1,0 +1,85 @@
+[
+ {
+  "scene": "buongiorno",
+  "text": "Buongiorno! Sono un contratto. Tre pagine, due firme... e parecchi dati riservati.",
+  "caption": "Buongiorno! Sono un contratto. Tre pagine, due firme… e parecchi dati riservati.",
+  "direction": "orgoglioso abbassando la voce"
+ },
+ {
+  "scene": "fretta",
+  "text": "Ore nove e quindici. Qualcuno ha fretta.",
+  "caption": "Ore nove e quindici. Qualcuno ha fretta.",
+  "direction": "allarmato"
+ },
+ {
+  "scene": "fretta",
+  "text": "Mi copia... e mi incolla in un ciàtbot trovato online.",
+  "caption": "Mi copia… e mi incolla in un chatbot trovato online.",
+  "direction": "incredulo",
+  "pre": 0.7
+ },
+ {
+  "scene": "fretta",
+  "text": "Gratis. Che fortuna.",
+  "caption": "Gratis. Che fortuna.",
+  "direction": "sarcastico",
+  "pre": 1.0
+ },
+ {
+  "scene": "nessuno",
+  "text": "Nessuno l'ha vietato. Nessuno l'ha autorizzato. Diciamo che... nessuno ha chiesto.",
+  "caption": "Nessuno l'ha vietato. Nessuno l'ha autorizzato. Diciamo che… nessuno ha chiesto.",
+  "direction": "pausa"
+ },
+ {
+  "scene": "viaggio",
+  "text": "Trenta secondi, ed è fatto.",
+  "caption": "Trenta secondi, ed è fatto.",
+  "direction": "veloce"
+ },
+ {
+  "scene": "viaggio",
+  "text": "Peccato che adesso io sia qui. Non so nemmeno in che paese.",
+  "caption": "Peccato che adesso io sia qui. Non so nemmeno in che paese.",
+  "direction": "spaesato",
+  "pre": 1.5
+ },
+ {
+  "scene": "nome",
+  "text": "Questa si chiama sciàdou èi ài.",
+  "caption": "Questa si chiama Shadow AI.",
+  "direction": "chiaro, scandito"
+ },
+ {
+  "scene": "rischio",
+  "text": "E il rischio è doppio. Per l'azienda: dati dei clienti esposti, informazioni riservate fuori controllo. Per te: errori che firmi tu, e regole aziendali violate.",
+  "caption": "E il rischio è doppio. Per l'azienda: dati dei clienti esposti, informazioni riservate fuori controllo. Per te: errori che firmi tu, e regole aziendali violate.",
+  "direction": "serio"
+ },
+ {
+  "scene": "rischio",
+  "text": "Firmate da te, eh.",
+  "caption": "Firmate da te, eh.",
+  "direction": "sottovoce, ammiccante",
+  "pre": 0.6
+ },
+ {
+  "scene": "riavvolgi",
+  "text": "Riavvolgiamo.",
+  "caption": "Riavvolgiamo.",
+  "direction": "deciso"
+ },
+ {
+  "scene": "giusta",
+  "text": "Stessa azienda, tre cose in più. Uno strumento approvato. Regole chiare. Persone formate.",
+  "caption": "Stessa azienda, tre cose in più. Uno strumento approvato. Regole chiare. Persone formate.",
+  "direction": "sollevato"
+ },
+ {
+  "scene": "finale",
+  "text": "Il lavoro si fa lo stesso, in trenta secondi. E io... resto a casa.",
+  "caption": "Il lavoro si fa lo stesso, in trenta secondi. E io… resto a casa.",
+  "direction": "soddisfatto sorridendo",
+  "pre": 0.3
+ }
+]

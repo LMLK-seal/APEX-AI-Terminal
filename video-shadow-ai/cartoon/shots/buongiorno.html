@@ -1,0 +1,41 @@
+  <div id="bg-lez" class="tag navy lbl" style="left:84px; top:70px; padding:12px 22px; font-size:28px; transform:rotate(-1.5deg)">Lezione 3 · Shadow AI</div>
+<script>
+  // Scena 1 - Buongiorno: si sveglia, saluta, si presenta fiero, mostra pagine e firma, confida il segreto.
+  const w = (word) => W(0, word);
+  const t0 = w("Buongiorno"), tSono = w("Sono"), tTre = w("Tre"), tDue = w("due"), tFirme = w("firme"), tE = w("e parecchi");
+  const tw = t0 - 0.85;                                  // il risveglio avviene appena la camera arriva
+  const K = [
+    [0, { x: 1000, y: 864, s: 1.22, open: 0, by: -288, bc: 2, sq: 0.96, lx: -120, ly: -92, rx: 120, ry: -92, lb: 0.2, rb: -0.2, r: 0, turn: 0, px: 0, py: 0, lid: 0, bt: 0, pages: 0, idleMouth: "rest", rh: "open", lh: "open" }],
+    [tw - 0.15, { open: 0, sq: 0.96 }],
+    [tw, { open: 1.18, by: -312, bc: 14, sq: 1.06, lx: -158, ly: -160, rx: 158, ry: -160 }, "back.out(2)"],          // sveglia di soprassalto
+    [tw + 0.25, { open: 1, by: -300, bc: 8, sq: 1, lx: -150, ly: -120, rx: 150, ry: -120 }, "power2.out"],
+    [t0 - 0.12, { rx: 162, ry: -98 }, "power2.in"],                                                              // anticipazione del saluto
+    [t0 + 0.12, { rx: 150, ry: -288, rb: -0.35, by: -306, bc: 14 }, "back.out(1.7)"],
+    [t0 + 0.32, { rx: 186, ry: -270 }, "sine.inOut"], [t0 + 0.52, { rx: 140, ry: -292 }, "sine.inOut"], [t0 + 0.72, { rx: 182, ry: -272 }, "sine.inOut"],
+    [tSono, { rf: true, rx: 28, ry: -172, rb: -0.7, lid: 0.22, by: -304, bc: 4, sq: 1.03, r: -2 }, "power3.out"],                // fiero: mano sul petto
+    [tTre - 0.05, { pages: 0 }],
+    [tTre + 0.25, { rf: false, pages: 1, lid: 0, rx: 150, ry: -150, rb: -0.3, r: 0 }, "back.out(1.8)"],                          // "Tre pagine"
+    [tDue, { rf: true, rx: 64, ry: -92, rb: -0.6, rh: "point", py: 0.7, px: 0.3, bc: 10 }, "power2.inOut"],                     // indica la firma
+    [tFirme + 0.2, { pages: 0 }, "power2.in"],
+    [tE, { rf: false, lf: true, s: 1.3, y: 870, rh: "open", rx: 150, ry: -120, rb: -0.3, lx: -46, ly: -206, lb: 0.6, px: -0.85, py: 0, lid: 0.32, bt: 8, bc: 6, turn: 0.15 }, "power2.inOut"],
+    [L[0].b + 0.05, { idleMouth: "smirk" }],
+    [DUR, { px: 0, lid: 0.25, bt: 4 }, "power1.inOut"],
+  ];
+  const CAM = [[0, { x: 1470, y: 236, z: 2.5 }], [0.9, { x: 1462, y: 240, z: 2.4 }, "none"],
+               [tw + 0.05, { x: 980, y: 560, z: 1.0 }, "power3.inOut"], [DUR, { x: 1000, y: 610, z: 1.12 }, "power1.inOut"]];
+  const blinks = [t0 + 1.25, t0 + 3.55];
+  const update = Anim.stage($("svg.stage"), Scenes.office({ fx: false }), Scenes.fx("warm"), (t) => {
+    const c = Anim.at(K, t);
+    c.blink = Anim.blinkAt(blinks, t); c.mouth = MOUTH(t, c.idleMouth);
+    let a = `<g transform="translate(1470,230)">${Props.secondHand(t + 12)}</g><g transform="translate(1600,642)">${Props.steam(t)}</g>`;
+    a += Anim.shadow({ ...c, ground: 864 }, 135);
+    if (c.pages > 0.01) a += `<g transform="translate(${c.x},${c.y}) scale(${c.s})">` + [-1, 1].map((sd) =>
+      `<g transform="translate(${sd * 52 * c.pages},-58) rotate(${sd * 13 * c.pages})">${Props.sheet({ o: Math.min(1, c.pages * 1.6) })}</g>`).join("") + `</g>`;
+    a += Anim.place(Anim.contratto(c, t), c);
+    return { cam: Anim.at(CAM, t), actors: a };
+  });
+  Anim.drive(tl, DUR, update);
+  tl.fromTo("#bg-lez", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }, 0.25);
+  tl.to("#bg-lez", { opacity: 0, filter: "blur(6px)", duration: 0.2 }, DUR - 0.6);
+
+</script>

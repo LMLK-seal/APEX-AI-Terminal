@@ -1,0 +1,19 @@
+  <div id="ec-k" class="lbl" style="position:absolute; left:160px; top:320px; font-size:30px; color:#d58a52">Corso · Lezione 3</div>
+  <div id="ec-t" class="ttl" style="position:absolute; left:160px; top:370px; font-size:124px; color:#f4f1ea; line-height:1.02">Usare l'IA<br>in sicurezza</div>
+  <div id="ec-r" style="position:absolute; left:160px; top:666px; width:0; height:6px; background:#b5562a"></div>
+  <div id="ec-s" style="position:absolute; left:160px; top:696px; font-family:'Inter'; font-size:36px; color:#c8cdd6">Shadow AI: il contratto che resta a casa.</div>
+<script>
+  // Scena 10 - Cartello finale (solo il corso). Il Contratto si affaccia dal basso a destra e saluta.
+  const update = Anim.stage($("svg.stage"), `<rect width="1920" height="1080" fill="#141f2e"/><radialGradient id="ecg" cx="78%" cy="85%" r="60%"><stop offset="0" stop-color="#24354f"/><stop offset="1" stop-color="#141f2e"/></radialGradient><rect width="1920" height="1080" fill="url(#ecg)"/>`, Scenes.fx("cool"), (t) => {
+    const u = Anim.ease("back.out(1.6)")(Anim.clamp((t - 0.6) / 0.6));
+    const wave = t > 1.1 ? 22 * Math.sin((t - 1.1) * 10) * Math.exp(-(t - 1.1) * 0.8) : 0;
+    const c = { x: 1540, y: 1080 + 380 * (1 - u) + 40, s: 1.1, r: -6, by: -306, bc: 14, mouth: "smile", lx: -150, ly: -120, rx: 160 + wave, ry: -285, rb: -0.3,
+                open: t > 2.4 && t < 2.6 ? 0.1 : 1, px: -0.4 };
+    return { cam: { x: 960, y: 540, z: 1 }, actors: Anim.place(Anim.contratto(c, t), c) };
+  });
+  Anim.drive(tl, DUR, update);
+  tl.fromTo("#ec-k", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18 }, 0.2);
+  tl.fromTo("#ec-t", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.22, ease: "power4.out" }, 0.3);
+  tl.fromTo("#ec-r", { width: 0 }, { width: 420, duration: 0.5, ease: "expo.out" }, 0.55);
+  tl.fromTo("#ec-s", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2 }, 0.75);
+</script>

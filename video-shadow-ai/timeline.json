@@ -1,0 +1,980 @@
+{
+ "duration": 83.297,
+ "scenes": [
+  {
+   "id": "buongiorno",
+   "start": 0.0,
+   "end": 9.299
+  },
+  {
+   "id": "fretta",
+   "start": 9.299,
+   "end": 21.393
+  },
+  {
+   "id": "nessuno",
+   "start": 21.393,
+   "end": 29.983
+  },
+  {
+   "id": "viaggio",
+   "start": 29.983,
+   "end": 39.115
+  },
+  {
+   "id": "nome",
+   "start": 39.115,
+   "end": 43.278
+  },
+  {
+   "id": "rischio",
+   "start": 43.278,
+   "end": 61.381
+  },
+  {
+   "id": "riavvolgi",
+   "start": 61.381,
+   "end": 64.606
+  },
+  {
+   "id": "giusta",
+   "start": 64.606,
+   "end": 73.294
+  },
+  {
+   "id": "finale",
+   "start": 73.294,
+   "end": 79.697
+  },
+  {
+   "id": "cartello",
+   "start": 79.697,
+   "end": 83.297
+  }
+ ],
+ "lines": [
+  {
+   "scene": "buongiorno",
+   "text": "Buongiorno! Sono un contratto. Tre pagine, due firme... e parecchi dati riservati.",
+   "caption": "Buongiorno! Sono un contratto. Tre pagine, due firme… e parecchi dati riservati.",
+   "direction": "orgoglioso abbassando la voce",
+   "i": 0,
+   "wav": "audio/eleven/00.wav",
+   "trim_start": 0.12,
+   "speech": 6.699,
+   "pauses": [
+    [
+     0.0,
+     4.4
+    ],
+    [
+     4.736,
+     6.699
+    ]
+   ],
+   "start": 2.0,
+   "end": 8.699,
+   "words": [
+    {
+     "w": "Buongiorno!",
+     "start": 1.88,
+     "end": 2.8
+    },
+    {
+     "w": "Sono",
+     "start": 2.9,
+     "end": 3.16
+    },
+    {
+     "w": "un",
+     "start": 3.16,
+     "end": 3.32
+    },
+    {
+     "w": "contratto.",
+     "start": 3.32,
+     "end": 4.12
+    },
+    {
+     "w": "Tre",
+     "start": 4.4,
+     "end": 4.62
+    },
+    {
+     "w": "pagine,",
+     "start": 4.62,
+     "end": 5.18
+    },
+    {
+     "w": "due",
+     "start": 5.42,
+     "end": 5.6
+    },
+    {
+     "w": "firme…",
+     "start": 5.6,
+     "end": 6.56
+    },
+    {
+     "w": "e",
+     "start": 6.56,
+     "end": 6.86
+    },
+    {
+     "w": "parecchi",
+     "start": 6.86,
+     "end": 7.5
+    },
+    {
+     "w": "dati",
+     "start": 7.5,
+     "end": 7.84
+    },
+    {
+     "w": "riservati.",
+     "start": 7.84,
+     "end": 8.56
+    }
+   ]
+  },
+  {
+   "scene": "fretta",
+   "text": "Ore nove e quindici. Qualcuno ha fretta.",
+   "caption": "Ore nove e quindici. Qualcuno ha fretta.",
+   "direction": "allarmato",
+   "i": 1,
+   "wav": "audio/eleven/01.wav",
+   "trim_start": 0.184,
+   "speech": 2.56,
+   "pauses": [
+    [
+     0.0,
+     2.56
+    ]
+   ],
+   "start": 9.799,
+   "end": 12.359,
+   "words": [
+    {
+     "w": "Ore",
+     "start": 9.615,
+     "end": 9.995
+    },
+    {
+     "w": "nove",
+     "start": 9.995,
+     "end": 10.175
+    },
+    {
+     "w": "e",
+     "start": 10.175,
+     "end": 10.835
+    },
+    {
+     "w": "quindici.",
+     "start": 10.175,
+     "end": 10.835
+    },
+    {
+     "w": "Qualcuno",
+     "start": 11.295,
+     "end": 11.715
+    },
+    {
+     "w": "ha",
+     "start": 11.715,
+     "end": 11.835
+    },
+    {
+     "w": "fretta.",
+     "start": 11.835,
+     "end": 12.295
+    }
+   ]
+  },
+  {
+   "scene": "fretta",
+   "text": "Mi copia... e mi incolla in un ciàtbot trovato online.",
+   "caption": "Mi copia… e mi incolla in un chatbot trovato online.",
+   "direction": "incredulo",
+   "pre": 0.7,
+   "i": 2,
+   "wav": "audio/eleven/02.wav",
+   "trim_start": 0.024,
+   "speech": 4.078,
+   "pauses": [
+    [
+     0.0,
+     1.04
+    ],
+    [
+     1.472,
+     4.078
+    ]
+   ],
+   "start": 13.409,
+   "end": 17.487,
+   "words": [
+    {
+     "w": "Mi",
+     "start": 13.385,
+     "end": 13.625
+    },
+    {
+     "w": "copia…",
+     "start": 13.625,
+     "end": 14.285
+    },
+    {
+     "w": "e",
+     "start": 14.285,
+     "end": 14.985
+    },
+    {
+     "w": "mi",
+     "start": 14.985,
+     "end": 15.145
+    },
+    {
+     "w": "incolla",
+     "start": 15.145,
+     "end": 15.585
+    },
+    {
+     "w": "in",
+     "start": 15.585,
+     "end": 15.665
+    },
+    {
+     "w": "un",
+     "start": 15.665,
+     "end": 15.785
+    },
+    {
+     "w": "chatbot",
+     "start": 15.785,
+     "end": 16.345
+    },
+    {
+     "w": "trovato",
+     "start": 16.345,
+     "end": 16.845
+    },
+    {
+     "w": "online.",
+     "start": 16.845,
+     "end": 17.265
+    }
+   ]
+  },
+  {
+   "scene": "fretta",
+   "text": "Gratis. Che fortuna.",
+   "caption": "Gratis. Che fortuna.",
+   "direction": "sarcastico",
+   "pre": 1.0,
+   "i": 3,
+   "wav": "audio/eleven/03.wav",
+   "trim_start": 0.0,
+   "speech": 1.856,
+   "pauses": [
+    [
+     0.0,
+     1.856
+    ]
+   ],
+   "start": 18.837,
+   "end": 20.693,
+   "words": [
+    {
+     "w": "Gratis.",
+     "start": 18.837,
+     "end": 19.417
+    },
+    {
+     "w": "Che",
+     "start": 19.417,
+     "end": 19.597
+    },
+    {
+     "w": "fortuna.",
+     "start": 19.597,
+     "end": 20.217
+    }
+   ]
+  },
+  {
+   "scene": "nessuno",
+   "text": "Nessuno l'ha vietato. Nessuno l'ha autorizzato. Diciamo che... nessuno ha chiesto.",
+   "caption": "Nessuno l'ha vietato. Nessuno l'ha autorizzato. Diciamo che… nessuno ha chiesto.",
+   "direction": "pausa",
+   "i": 4,
+   "wav": "audio/eleven/04.wav",
+   "trim_start": 0.056,
+   "speech": 7.39,
+   "pauses": [
+    [
+     0.0,
+     2.992
+    ],
+    [
+     4.96,
+     7.39
+    ]
+   ],
+   "start": 21.893,
+   "end": 29.283,
+   "words": [
+    {
+     "w": "Nessuno",
+     "start": 21.837,
+     "end": 22.257
+    },
+    {
+     "w": "l'ha",
+     "start": 22.257,
+     "end": 22.377
+    },
+    {
+     "w": "vietato.",
+     "start": 22.417,
+     "end": 22.857
+    },
+    {
+     "w": "Nessuno",
+     "start": 23.317,
+     "end": 23.717
+    },
+    {
+     "w": "l'ha",
+     "start": 23.717,
+     "end": 23.897
+    },
+    {
+     "w": "autorizzato.",
+     "start": 23.957,
+     "end": 24.717
+    },
+    {
+     "w": "Diciamo",
+     "start": 26.437,
+     "end": 27.277
+    },
+    {
+     "w": "che…",
+     "start": 27.277,
+     "end": 27.537
+    },
+    {
+     "w": "nessuno",
+     "start": 27.537,
+     "end": 28.557
+    },
+    {
+     "w": "ha",
+     "start": 28.557,
+     "end": 28.717
+    },
+    {
+     "w": "chiesto.",
+     "start": 28.717,
+     "end": 29.257
+    }
+   ]
+  },
+  {
+   "scene": "viaggio",
+   "text": "Trenta secondi, ed è fatto.",
+   "caption": "Trenta secondi, ed è fatto.",
+   "direction": "veloce",
+   "i": 5,
+   "wav": "audio/eleven/05.wav",
+   "trim_start": 0.12,
+   "speech": 1.657,
+   "pauses": [
+    [
+     0.0,
+     1.657
+    ]
+   ],
+   "start": 30.983,
+   "end": 32.64,
+   "words": [
+    {
+     "w": "Trenta",
+     "start": 30.863,
+     "end": 31.143
+    },
+    {
+     "w": "secondi,",
+     "start": 31.143,
+     "end": 31.863
+    },
+    {
+     "w": "ed",
+     "start": 31.863,
+     "end": 32.063
+    },
+    {
+     "w": "è",
+     "start": 32.063,
+     "end": 32.183
+    },
+    {
+     "w": "fatto.",
+     "start": 32.183,
+     "end": 32.363
+    }
+   ]
+  },
+  {
+   "scene": "viaggio",
+   "text": "Peccato che adesso io sia qui. Non so nemmeno in che paese.",
+   "caption": "Peccato che adesso io sia qui. Non so nemmeno in che paese.",
+   "direction": "spaesato",
+   "pre": 1.5,
+   "i": 6,
+   "wav": "audio/eleven/06.wav",
+   "trim_start": 0.056,
+   "speech": 4.125,
+   "pauses": [
+    [
+     0.0,
+     2.064
+    ],
+    [
+     2.4,
+     4.125
+    ]
+   ],
+   "start": 34.49,
+   "end": 38.615,
+   "words": [
+    {
+     "w": "Peccato",
+     "start": 34.434,
+     "end": 35.054
+    },
+    {
+     "w": "che",
+     "start": 35.054,
+     "end": 35.194
+    },
+    {
+     "w": "adesso",
+     "start": 35.194,
+     "end": 35.514
+    },
+    {
+     "w": "io",
+     "start": 35.514,
+     "end": 35.774
+    },
+    {
+     "w": "sia",
+     "start": 35.774,
+     "end": 35.974
+    },
+    {
+     "w": "qui.",
+     "start": 35.974,
+     "end": 36.294
+    },
+    {
+     "w": "Non",
+     "start": 36.874,
+     "end": 37.114
+    },
+    {
+     "w": "so",
+     "start": 37.114,
+     "end": 37.334
+    },
+    {
+     "w": "nemmeno",
+     "start": 37.334,
+     "end": 37.734
+    },
+    {
+     "w": "in",
+     "start": 37.734,
+     "end": 37.814
+    },
+    {
+     "w": "che",
+     "start": 37.814,
+     "end": 37.934
+    },
+    {
+     "w": "paese.",
+     "start": 37.934,
+     "end": 38.434
+    }
+   ]
+  },
+  {
+   "scene": "nome",
+   "text": "Questa si chiama sciàdou èi ài.",
+   "caption": "Questa si chiama Shadow AI.",
+   "direction": "chiaro, scandito",
+   "i": 7,
+   "wav": "audio/eleven/07.wav",
+   "trim_start": 0.12,
+   "speech": 2.363,
+   "pauses": [
+    [
+     0.0,
+     2.363
+    ]
+   ],
+   "start": 39.415,
+   "end": 41.778,
+   "words": [
+    {
+     "w": "Questa",
+     "start": 39.295,
+     "end": 39.815
+    },
+    {
+     "w": "si",
+     "start": 39.815,
+     "end": 40.155
+    },
+    {
+     "w": "chiama",
+     "start": 40.155,
+     "end": 40.415
+    },
+    {
+     "w": "Shadow",
+     "start": 40.415,
+     "end": 40.995
+    },
+    {
+     "w": "AI.",
+     "start": 40.995,
+     "end": 41.435
+    }
+   ]
+  },
+  {
+   "scene": "rischio",
+   "text": "E il rischio è doppio. Per l'azienda: dati dei clienti esposti, informazioni riservate fuori controllo. Per te: errori che firmi tu, e regole aziendali violate.",
+   "caption": "E il rischio è doppio. Per l'azienda: dati dei clienti esposti, informazioni riservate fuori controllo. Per te: errori che firmi tu, e regole aziendali violate.",
+   "direction": "serio",
+   "i": 8,
+   "wav": "audio/eleven/08.wav",
+   "trim_start": 0.152,
+   "speech": 14.269,
+   "pauses": [
+    [
+     0.0,
+     2.192
+    ],
+    [
+     2.656,
+     8.432
+    ],
+    [
+     9.216,
+     9.84
+    ],
+    [
+     10.016,
+     14.269
+    ]
+   ],
+   "start": 43.878,
+   "end": 58.147,
+   "words": [
+    {
+     "w": "E",
+     "start": 43.726,
+     "end": 44.046
+    },
+    {
+     "w": "il",
+     "start": 44.046,
+     "end": 44.266
+    },
+    {
+     "w": "rischio",
+     "start": 44.266,
+     "end": 44.786
+    },
+    {
+     "w": "è",
+     "start": 44.786,
+     "end": 45.266
+    },
+    {
+     "w": "doppio.",
+     "start": 45.266,
+     "end": 45.946
+    },
+    {
+     "w": "Per",
+     "start": 46.566,
+     "end": 46.666
+    },
+    {
+     "w": "l'azienda:",
+     "start": 46.666,
+     "end": 46.846
+    },
+    {
+     "w": "dati",
+     "start": 47.846,
+     "end": 48.186
+    },
+    {
+     "w": "dei",
+     "start": 48.186,
+     "end": 48.306
+    },
+    {
+     "w": "clienti",
+     "start": 48.306,
+     "end": 48.766
+    },
+    {
+     "w": "esposti,",
+     "start": 48.766,
+     "end": 49.466
+    },
+    {
+     "w": "informazioni",
+     "start": 49.786,
+     "end": 50.406
+    },
+    {
+     "w": "riservate",
+     "start": 50.406,
+     "end": 51.106
+    },
+    {
+     "w": "fuori",
+     "start": 51.286,
+     "end": 51.506
+    },
+    {
+     "w": "controllo.",
+     "start": 51.506,
+     "end": 52.166
+    },
+    {
+     "w": "Per",
+     "start": 53.126,
+     "end": 53.286
+    },
+    {
+     "w": "te:",
+     "start": 53.286,
+     "end": 53.546
+    },
+    {
+     "w": "errori",
+     "start": 54.226,
+     "end": 54.686
+    },
+    {
+     "w": "che",
+     "start": 54.686,
+     "end": 54.786
+    },
+    {
+     "w": "firmi",
+     "start": 54.786,
+     "end": 55.246
+    },
+    {
+     "w": "tu,",
+     "start": 55.246,
+     "end": 55.466
+    },
+    {
+     "w": "e",
+     "start": 55.466,
+     "end": 55.986
+    },
+    {
+     "w": "regole",
+     "start": 55.986,
+     "end": 56.406
+    },
+    {
+     "w": "aziendali",
+     "start": 56.406,
+     "end": 57.166
+    },
+    {
+     "w": "violate.",
+     "start": 57.166,
+     "end": 57.986
+    }
+   ]
+  },
+  {
+   "scene": "rischio",
+   "text": "Firmate da te, eh.",
+   "caption": "Firmate da te, eh.",
+   "direction": "sottovoce, ammiccante",
+   "pre": 0.6,
+   "i": 9,
+   "wav": "audio/eleven/09.wav",
+   "trim_start": 0.184,
+   "speech": 1.584,
+   "pauses": [
+    [
+     0.0,
+     1.584
+    ]
+   ],
+   "start": 59.097,
+   "end": 60.681,
+   "words": [
+    {
+     "w": "Firmate",
+     "start": 58.913,
+     "end": 59.613
+    },
+    {
+     "w": "da",
+     "start": 59.613,
+     "end": 59.833
+    },
+    {
+     "w": "te,",
+     "start": 59.833,
+     "end": 60.193
+    },
+    {
+     "w": "eh.",
+     "start": 60.293,
+     "end": 60.533
+    }
+   ]
+  },
+  {
+   "scene": "riavvolgi",
+   "text": "Riavvolgiamo.",
+   "caption": "Riavvolgiamo.",
+   "direction": "deciso",
+   "i": 10,
+   "wav": "audio/eleven/10.wav",
+   "trim_start": 0.056,
+   "speech": 1.225,
+   "pauses": [
+    [
+     0.0,
+     1.225
+    ]
+   ],
+   "start": 62.381,
+   "end": 63.606,
+   "words": [
+    {
+     "w": "Riavvolgiamo.",
+     "start": 62.325,
+     "end": 63.265
+    }
+   ]
+  },
+  {
+   "scene": "giusta",
+   "text": "Stessa azienda, tre cose in più. Uno strumento approvato. Regole chiare. Persone formate.",
+   "caption": "Stessa azienda, tre cose in più. Uno strumento approvato. Regole chiare. Persone formate.",
+   "direction": "sollevato",
+   "i": 11,
+   "wav": "audio/eleven/11.wav",
+   "trim_start": 0.088,
+   "speech": 6.888,
+   "pauses": [
+    [
+     0.0,
+     2.352
+    ],
+    [
+     2.656,
+     4.144
+    ],
+    [
+     4.352,
+     5.456
+    ],
+    [
+     5.568,
+     6.888
+    ]
+   ],
+   "start": 65.906,
+   "end": 72.794,
+   "words": [
+    {
+     "w": "Stessa",
+     "start": 65.818,
+     "end": 66.338
+    },
+    {
+     "w": "azienda,",
+     "start": 66.338,
+     "end": 66.958
+    },
+    {
+     "w": "tre",
+     "start": 66.958,
+     "end": 67.358
+    },
+    {
+     "w": "cose",
+     "start": 67.358,
+     "end": 67.698
+    },
+    {
+     "w": "in",
+     "start": 67.698,
+     "end": 67.858
+    },
+    {
+     "w": "più.",
+     "start": 67.858,
+     "end": 68.098
+    },
+    {
+     "w": "Uno",
+     "start": 68.098,
+     "end": 68.738
+    },
+    {
+     "w": "strumento",
+     "start": 68.738,
+     "end": 69.278
+    },
+    {
+     "w": "approvato.",
+     "start": 69.278,
+     "end": 69.918
+    },
+    {
+     "w": "Regole",
+     "start": 69.918,
+     "end": 70.698
+    },
+    {
+     "w": "chiare.",
+     "start": 70.698,
+     "end": 71.198
+    },
+    {
+     "w": "Persone",
+     "start": 71.198,
+     "end": 71.878
+    },
+    {
+     "w": "formate.",
+     "start": 71.878,
+     "end": 72.598
+    }
+   ]
+  },
+  {
+   "scene": "finale",
+   "text": "Il lavoro si fa lo stesso, in trenta secondi. E io... resto a casa.",
+   "caption": "Il lavoro si fa lo stesso, in trenta secondi. E io… resto a casa.",
+   "direction": "soddisfatto sorridendo",
+   "pre": 0.3,
+   "i": 12,
+   "wav": "audio/eleven/12.wav",
+   "trim_start": 0.248,
+   "speech": 4.403,
+   "pauses": [
+    [
+     0.0,
+     2.48
+    ],
+    [
+     2.688,
+     3.216
+    ],
+    [
+     3.456,
+     4.403
+    ]
+   ],
+   "start": 73.994,
+   "end": 78.397,
+   "words": [
+    {
+     "w": "Il",
+     "start": 73.746,
+     "end": 73.986
+    },
+    {
+     "w": "lavoro",
+     "start": 73.986,
+     "end": 74.206
+    },
+    {
+     "w": "si",
+     "start": 74.206,
+     "end": 74.406
+    },
+    {
+     "w": "fa",
+     "start": 74.406,
+     "end": 74.566
+    },
+    {
+     "w": "lo",
+     "start": 74.566,
+     "end": 74.686
+    },
+    {
+     "w": "stesso,",
+     "start": 74.686,
+     "end": 75.046
+    },
+    {
+     "w": "in",
+     "start": 75.046,
+     "end": 75.426
+    },
+    {
+     "w": "trenta",
+     "start": 75.426,
+     "end": 75.766
+    },
+    {
+     "w": "secondi.",
+     "start": 75.766,
+     "end": 76.566
+    },
+    {
+     "w": "E",
+     "start": 76.566,
+     "end": 76.826
+    },
+    {
+     "w": "io…",
+     "start": 76.826,
+     "end": 77.086
+    },
+    {
+     "w": "resto",
+     "start": 77.086,
+     "end": 77.706
+    },
+    {
+     "w": "a",
+     "start": 77.706,
+     "end": 77.926
+    },
+    {
+     "w": "casa.",
+     "start": 77.926,
+     "end": 78.126
+    }
+   ]
+  }
+ ]
+}

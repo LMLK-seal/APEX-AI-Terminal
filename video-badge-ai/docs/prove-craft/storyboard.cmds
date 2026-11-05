@@ -1,0 +1,19 @@
+# Storyboard deck 16:9 (960x540 pt)
+file.new={"blank":true,"size":[960,540]}
+slide.new={"layout":"blank"}
+design.background={"color":"#F4EBD9"}
+insert.picture={"path":"C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png","rect":[24,40,620,349]}
+insert.textBox={"rect":[664,40,272,460],"text":"Scena 1 - buongiorno\nBuongiorno. Sono il badge di Nodomatic.\nInquadratura: PP badge, leggera oscillazione\nSuono: ambiente ufficio, passi"}
+text.edit
+text.select={"anchor":[0,0],"caret":[0,20]}
+format.size={"size":24}
+format.bold={"on":true}
+text.select={"anchor":[1,0],"caret":[1,38]}
+format.size={"size":16}
+text.select={"anchor":[2,0],"caret":[2,45]}
+format.size={"size":12}
+format.italic={"on":true}
+text.select={"anchor":[3,0],"caret":[3,30]}
+format.size={"size":12}
+format.color={"color":"#B03030"}
+text.exit

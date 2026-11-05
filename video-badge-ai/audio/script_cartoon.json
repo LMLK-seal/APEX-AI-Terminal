@@ -1,0 +1,89 @@
+[
+ {
+  "scene": "buongiorno",
+  "text": "Buongiorno. Sono il badge di Nodomàtic. Qui dentro entra solo chi è autorizzato.",
+  "caption": "Buongiorno. Sono il badge di Nodomatic. Qui dentro entra solo chi è autorizzato.",
+  "direction": "fiero, da portiere puntiglioso"
+ },
+ {
+  "scene": "buongiorno",
+  "text": "Persone, pacchi... e da qualche tempo, anche le intelligenze artificiali.",
+  "caption": "Persone, pacchi… e da qualche tempo, anche le intelligenze artificiali.",
+  "direction": "ironico",
+  "pre": 0.6
+ },
+ {
+  "scene": "porta",
+  "text": "Còpailot, con l'account aziendale: prego, entri pure.",
+  "caption": "Copilot, con l'account aziendale: prego, entri pure.",
+  "direction": "cortese"
+ },
+ {
+  "scene": "porta",
+  "text": "Clòd: solo con chi ha la licenza. Il nome sul badge deve essere il tuo.",
+  "caption": "Claude: solo con chi ha la licenza. Il nome sul badge deve essere il tuo.",
+  "direction": "preciso, alza un dito",
+  "pre": 0.5
+ },
+ {
+  "scene": "fretta",
+  "text": "Ore nove e quindici. Qualcuno ha fretta.",
+  "caption": "Ore nove e quindici. Qualcuno ha fretta.",
+  "direction": "allarmato"
+ },
+ {
+  "scene": "fretta",
+  "text": "E dalla finestra entra un amico famoso: Ciat gi pi tì. Poi Perplèxiti. Tutti gratis, tutti simpatici.",
+  "caption": "E dalla finestra entra un amico famoso: ChatGPT. Poi Perplexity. Tutti gratis, tutti simpatici.",
+  "direction": "sarcastico",
+  "pre": 0.7
+ },
+ {
+  "scene": "porta-sbagliata",
+  "text": "Oppure Clòd, sì... ma con l'account personale. Stesso nome, porta sbagliata.",
+  "caption": "Oppure Claude, sì… ma con l'account personale. Stesso nome, porta sbagliata.",
+  "direction": "sopracciglio alzato"
+ },
+ {
+  "scene": "nessuno",
+  "text": "Tanto è solo un riassunto. Tanto lo usano tutti. Tanto... chi controlla?",
+  "caption": "Tanto è solo un riassunto. Tanto lo usano tutti. Tanto… chi controlla?",
+  "direction": "imita le scuse, poi pausa"
+ },
+ {
+  "scene": "viaggio",
+  "text": "Il file esce. Senza badge, senza registro. E non torna indietro.",
+  "caption": "Il file esce. Senza badge, senza registro. E non torna indietro.",
+  "direction": "secco"
+ },
+ {
+  "scene": "nome",
+  "text": "Questo si chiama strumento non autorizzato. Anche se è famoso. Anche se è gratis.",
+  "caption": "Questo si chiama: strumento non autorizzato. Anche se è famoso. Anche se è gratis.",
+  "direction": "scandito"
+ },
+ {
+  "scene": "rischio",
+  "text": "Per l'azienda: dati dei clienti fuori controllo. Per te: regole aziendali violate. E sul badge, c'è il tuo nome.",
+  "caption": "Per l'azienda: dati dei clienti fuori controllo. Per te: regole aziendali violate. E sul badge c'è il tuo nome.",
+  "direction": "serio, poi ammicca"
+ },
+ {
+  "scene": "riavvolgi",
+  "text": "Riavvolgiamo.",
+  "caption": "Riavvolgiamo.",
+  "direction": "deciso"
+ },
+ {
+  "scene": "giusta",
+  "text": "Tre regole. Uno: Còpailot, con l'account aziendale. Due: Clòd, solo se la licenza è tua. Tre: per tutto il resto, prima si chiede all'I Ti.",
+  "caption": "Tre regole. Uno: Copilot, con l'account aziendale. Due: Claude, solo se la licenza è tua. Tre: per tutto il resto, prima si chiede all'IT.",
+  "direction": "chiaro, ritmato"
+ },
+ {
+  "scene": "finale",
+  "text": "Stesso lavoro, stessa velocità. E io... non devo cacciare nessuno.",
+  "caption": "Stesso lavoro, stessa velocità. E io… non devo cacciare nessuno.",
+  "direction": "soddisfatto"
+ }
+]

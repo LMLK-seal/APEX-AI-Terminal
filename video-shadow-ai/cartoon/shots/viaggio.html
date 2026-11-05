@@ -1,0 +1,72 @@
+<script>
+  // Scena 4 - Il viaggio. (A) la camera entra nello schermo di ChatGratis; (B) la copia "surfa" su un cavo nella rete,
+  // tra pacchetti e bandierine con il punto interrogativo; (C) cade nella sala server buia: gli occhi dei server si
+  // accendono uno a uno, scende il cartellino "PAESE: ?".
+  const SCR = { x: 465, y: 602 };
+  const tB = 0.9, tC = 3.95;                                     // inizio rete, inizio sala server
+  const tPecc = W(1, "Peccato"), tQui = W(1, "qui"), tNon = W(1, "Non so"), tPaese = W(1, "paese");
+  const CAM = [
+    [0, { x: 760, y: 560, z: 1.08 }], [tB - 0.02, { x: SCR.x, y: SCR.y - 6, z: 5.2 }, "power3.in"],           // dentro lo schermo
+    [tB, { x: 960, y: 540, z: 1.0 }, "none"], [tC - 0.01, { x: 960, y: 540, z: 1.06 }, "none"],
+    [tC, { x: 960, y: 560, z: 1.0 }, "none"], [DUR, { x: 960, y: 640, z: 1.16 }, "power1.inOut"],
+  ];
+  // ChatGratis si tuffa di nuovo nello schermo (lo stesso percorso dell'uscita, al contrario) e la camera lo segue
+  const gratisIn = { t0: 0.0, T: 0.62, style: "burst", color: "#ffd23f", reverse: true, perch: { x: 465, y: 650, s: 0.95 },
+                     render: (t) => Anim.chatgratis({ lx: -200, ly: -150, rx: 200, ry: -150, mouth: "grin", lid: 0.3, px: -0.4 }, t) };
+  // la copia sul cavo (B) e nella sala server (C)
+  const cableY = (X, t) => 640 + 40 * Math.sin((X + ((t * 900 * 0.7) % 3840)) / 520 + 1.3) - 26;
+  const KC = [
+    [0, { x: 820, s: 1.0, open: 1.2, by: -314, bc: 18, px: 0.6, py: 0, lx: -195, ly: -200, rx: 195, ry: -205, sq: 0.95, idleMouth: "O", idle: 0 }],
+    [L[0].a, { px: 1, py: -0.2 }], [L[0].b, { px: 0.2, x: 900 }, "sine.inOut"],
+    [tC + 0.3, { x: 960, s: 0.95, open: 1.18, by: -312, bc: 16, px: 0, lx: -170, ly: -210, rx: 170, ry: -210, idleMouth: "O", idle: 1 }, "none"],
+    [tC + 0.55, { lx: -90, ly: -140, rx: 90, ry: -140, open: 1.08, bc: 22, by: -302, idleMouth: "worried", sweat: true }, "power2.out"],
+    [tPecc, { px: -1, py: 0.1, turn: -0.25 }, "power3.out"], [tPecc + 0.7, { px: 1, turn: 0.25 }, "power3.inOut"],
+    [tQui, { px: 0, turn: 0 }, "power2.out"],
+    [tNon + 0.25, { px: 0.7, py: -1, bc: 24, by: -306, turn: 0.1 }, "power2.out"],                            // guarda il cartellino
+    [tPaese + 0.3, { px: 0.1, py: -0.1, lid: 0, idleMouth: "worried" }, "power2.inOut"],
+  ];
+  const land = tC + 0.3;
+  const update = Anim.stage($("svg.stage"),
+    { office: Scenes.office({ fx: false }), net: `<rect width="1920" height="1080" fill="#0d1729"/>`, room: Scenes.serverRoom({ fx: false, servers: false }) },
+    { warm: Scenes.fx("warm"), night: Scenes.fx("night") },
+    (t) => {
+      const cam = Anim.at(CAM, t);
+      if (t < tB) {                                                              // A: dentro lo schermo
+        let a = `<g transform="translate(1470,230)">${Props.secondHand(t + 23)}</g>`;
+        // il Contratto e il Mouse restano dove erano (continuita'), il Contratto guarda lo schermo preoccupato
+        a += Anim.shadow({ x: 1000, y: 864, s: 1.22, ground: 864 }, 135) + Anim.place(Anim.contratto({ px: -1, py: 0.2, turn: -0.3, by: -302, bc: 22, mouth: "worried", lx: -90, ly: -150, rx: 90, ry: -150 }, t), { x: 1000, y: 864, s: 1.22 });
+        a += Anim.shadow({ x: 1440, y: 868, s: 0.95, ground: 868 }, 110) + Anim.place(Anim.mouse({ mouth: "smile", px: -0.6, lx: -140, ly: -150 }, t), { x: 1440, y: 868, s: 0.95 });
+        a += Anim.genieOut(t, gratisIn);
+        const fill = Anim.clamp((t - 0.55) / 0.3);
+        return { bg: "office", fx: "warm", cam, actors: a, over: fill > 0 ? `<rect width="1920" height="1080" fill="#ffe27a" opacity="${fill}"/>` : "" };
+      }
+      const c = Anim.at(KC, t);
+      c.mouth = MOUTH(t, c.idleMouth); c.blink = Anim.blinkAt([tQui + 0.4], t);
+      if (t < tC) {                                                              // B: la rete
+        const tb = t - tB;
+        c.y = cableY(c.x, tb); const slope = (cableY(c.x + 10, tb) - cableY(c.x - 10, tb)) / 20;
+        c.r = Math.atan(slope) * 57.3 + 4 + 3 * Math.sin(tb * 9);
+        let a = Scenes.network(tb) + `<g transform="translate(${c.x - 400},${c.y - 20})">${Props.speedLines(4, 240, 0.45)}</g>`;
+        a += `<g filter="url(#fxCopy)">${Anim.place(Anim.contratto(c, t), c)}</g>`;
+        const flash = Math.max(0, 1 - (t - tB) / 0.25);
+        return { bg: "net", fx: "night", cam, actors: a, over: flash > 0 ? `<rect width="1920" height="1080" fill="#ffe27a" opacity="${flash}"/>` : "" };
+      }
+      // C: la sala server
+      const fall = Anim.clamp((t - tC) / (land - tC)); c.y = -420 + (890 + 420) * Anim.ease("power2.in")(fall);
+      if (t >= land) { const d = t - land; c.sq = (c.sq ?? 1) * (d < 0.08 ? 0.78 : d < 0.2 ? 1.08 : 1); }
+      const opens = Array.from({ length: 12 }, (_, i) => Anim.clamp((t - tPecc - ((i * 5) % 12) * 0.12) / 0.15) * (0.6 + 0.4 * Math.abs(Math.sin(t * 2 + i))));
+      cam.x += Anim.shake(t, land, 12); cam.y += Anim.shake(t, land, 8);
+      let a = Scenes.racks(opens);
+      a += `<ellipse cx="960" cy="890" rx="260" ry="44" fill="#cfe0ff" opacity=".14"/>`;
+      if (t > land) { const d = t - land; a += [-1, 1].map((sd) => `<ellipse cx="${960 + sd * (60 + d * 260)}" cy="${886 - d * 20}" rx="${30 + d * 60}" ry="${14 + d * 20}" fill="#cfd8ea" opacity="${Math.max(0, 0.5 - d)}"/>`).join(""); }
+      a += Anim.shadow({ x: 960, y: c.y, s: c.s, ground: 890 }, 120, "#000", 0.45);
+      a += `<g filter="url(#fxCopy)">${Anim.place(Anim.contratto(c, t), c)}</g>`;
+      if (t > tNon - 0.3) {                                                     // il cartellino che scende e dondola
+        const d = t - (tNon - 0.3), drop = Math.min(1, d / 0.45), ang = 16 * Math.exp(-d * 1.6) * Math.cos(d * 7);
+        a += `<g transform="translate(1250,${-260 + 560 * Anim.ease("back.out(1.4)")(drop)}) rotate(${ang})"><line x1="0" y1="-600" x2="0" y2="0" stroke="#8796b3" stroke-width="3"/>
+          <g transform="translate(-140,0)"><rect width="280" height="80" rx="4" fill="#f1ebde" stroke="#1c2230" stroke-width="4"/><text x="140" y="54" text-anchor="middle" font-family="Inter" font-weight="800" font-size="40" letter-spacing="3" fill="#1c2230">PAESE: ?</text></g></g>`;
+      }
+      return { bg: "room", fx: "night", cam, actors: a };
+    });
+  Anim.drive(tl, DUR, update);
+</script>

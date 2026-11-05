@@ -1,0 +1,18 @@
+
+# chiavi e segreti locali (mai su GitHub)
+.env
+.env.*
+
+# ambienti locali (ricreati da tools/setup_windows.ps1)
+.venv/
+.tools/
+node_modules/
+
+# file di prova scartati delle app Craft
+# (si tengono script e file di comandi; i media si rigenerano con le ricette di docs/CRAFT-RICETTE.md)
+video-badge-ai/docs/prove-craft/**/*.png
+video-badge-ai/docs/prove-craft/**/*.jpg
+video-badge-ai/docs/prove-craft/**/*.mp4
+video-badge-ai/docs/prove-craft/**/*.wav
+video-badge-ai/docs/prove-craft/**/*.pdf
+video-badge-ai/docs/prove-craft/**/*.pptx

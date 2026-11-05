@@ -1,0 +1,68 @@
+  <div id="rk-a" class="tag cu lbl" style="left:150px; top:96px; padding:14px 24px; font-size:34px; transform:rotate(-2deg)">Per l'azienda</div>
+  <div id="rk-b" class="tag cu lbl" style="left:1110px; top:96px; padding:14px 24px; font-size:34px; transform:rotate(2deg)">Per te</div>
+  <div id="rk-st" class="lbl" style="position:absolute; left:1190px; top:330px; padding:16px 30px; font-size:52px; color:#c23a24; border:9px solid #c23a24; border-radius:12px; transform:rotate(-9deg); background:rgba(241,235,222,.9)">Firmato: tu</div>
+<script>
+  // Scena 6 - Il rischio e' doppio. Il foglio si strappa in due. Sinistra (azienda, carta chiara): dalla cartella
+  // RISERVATO escono le schede dei clienti, poi salta il lucchetto e i fogli volano via. Destra (te, blu): il Contratto
+  // firma e compaiono tre croci rosse; il libro delle regole si strappa: VIOLATE. "Firmate da te, eh.": timbro.
+  const w = (x, e) => W(0, x, e);
+  const tDop = w("doppio", "end"), tAz = w("Per l'azienda"), tDati = w("dati"), tEsp = w("esposti"), tInf = w("informazioni"), tCtrl = w("controllo");
+  const tTe = w("Per te"), tErr = w("errori"), tFirmi = w("firmi"), tReg = w("regole"), tViol = w("violate"), tEh = L[1].a;
+  const split = (t) => Anim.ease("power3.inOut")(Anim.clamp((t - tDop + 0.05) / 0.5));
+  const KC = [
+    [0, { x: 960, y: 900, s: 1.05, by: -302, bc: 18, px: 0, py: 0, lx: -100, ly: -140, rx: 100, ry: -140, idleMouth: "worried", sweat: true, open: 1.05 }],
+    [tDop + 0.05, { x: 960, y: 900 }], [tDop + 0.3, { x: 1150, y: 820, sq: 1.06 }, "power2.out"], [tDop + 0.55, { x: 1320, y: 900, sq: 1 }, "power2.in"],   // salta nel pannello "te"
+    [tAz, { px: -1, py: 0, turn: -0.2 }, "power2.out"],                                                               // guarda l'azienda
+    [tTe - 0.1, { px: 0, turn: 0, by: -306 }, "power2.out"],
+    [tErr, { px: 1, py: -0.6, turn: 0.2, rx: 190, ry: -230, rb: -0.3 }, "power2.out"],                                // firma (mano verso il foglio)
+    [tFirmi + 0.3, { px: 1, py: -0.6, bc: 24, open: 1.18 }],
+    [tReg, { px: 1, py: 0.4, rx: 120, ry: -120, bc: 24, by: -300 }, "power2.inOut"],                                  // guarda il libro delle regole
+    [tViol + 0.4, { open: 1.2, by: -314, bc: 26, lx: -150, ly: -230, rx: 150, ry: -230 }, "back.out(2)"],             // sobbalza
+    [tEh - 0.15, { lf: true, lx: -40, ly: -206, lb: 0.6, rx: 140, ry: -110, px: -0.6, py: 0, lid: 0.34, bt: 8, bc: 6, turn: 0.15, sweat: false, idleMouth: "smirk", open: 1 }, "power2.inOut"],
+  ];
+  const CAM = [[0, { x: 960, y: 540, z: 1 }], [tEh - 0.12, { x: 960, y: 540, z: 1 }, "none"], [tEh - 0.1, { x: 1330, y: 690, z: 1.55 }, "none"], [DUR, { x: 1336, y: 690, z: 1.6 }, "power1.inOut"]];
+  const cards = [[-300, -330, -12, "#2f8f83", "A"], [-120, -430, 8, "#b5562a", "B"], [120, -420, -6, "#5d7fb0", "C"], [300, -320, 12, "#d8a24a", "D"], [-260, -150, 6, "#e0457b", "E"], [260, -160, -10, "#2f8f83", "F"]];
+  const update = Anim.stage($("svg.stage"), `<rect width="1920" height="1080" fill="#efe3cc"/>`, Scenes.fx("cool"), (t) => {
+    const c = Anim.at(KC, t); c.mouth = MOUTH(t, c.idleMouth); c.blink = Anim.blinkAt([tInf + 0.3, tViol + 1.0], t);
+    const sp = split(t); let a = Scenes.studio(sp);
+    // --- pannello sinistro: l'azienda
+    if (sp > 0.6) {
+      const op = Anim.clamp((t - tInf) / 0.35), fo = Anim.clamp((t - tInf - 0.15) / 0.4);
+      a += `<g transform="translate(480,880) scale(1.15)">${Props.folder({ open: fo })}</g>`;
+      a += `<g transform="translate(560,${730 - 30 * Anim.ease("back.out(2)")(op)}) rotate(${op * 12})">${Props.padlock({ open: op })}</g>`;
+      cards.forEach(([dx, dy, r, col, l], i) => {
+        const u = Anim.ease("back.out(1.5)")(Anim.clamp((t - tDati - i * 0.09) / 0.5)); if (u <= 0) return;
+        const bob = 8 * Math.sin(t * 2.2 + i);
+        a += `<g transform="translate(${480 + dx * u},${800 + dy * u + bob}) scale(${0.4 + 0.7 * u})">${Props.clientCard({ r: r * u + 3 * Math.sin(t * 1.7 + i), c: col, l })}</g>`;
+        const ex = Anim.clamp(1 - Math.abs(t - tEsp - 0.1) / 0.25);                      // "esposti": lampeggiano
+        if (ex > 0) a += `<circle cx="${480 + dx}" cy="${800 + dy + bob}" r="${70 + 20 * ex}" fill="none" stroke="#fff" stroke-width="6" opacity="${ex}"/>`;
+      });
+      for (let i = 0; i < 7; i++) {                                                     // fogli riservati che scappano
+        const u = Anim.clamp((t - tCtrl + 0.3 - i * 0.11) / 2.4); if (u <= 0) continue;
+        a += `<g transform="translate(${480 - 80 + i * 30 - u * (260 + i * 50)},${760 - u * (520 + i * 40)}) rotate(${u * (200 + i * 60) * (i % 2 ? 1 : -1)}) scale(.34)">${Props.sheet({})}</g>`;
+      }
+    }
+    // --- pannello destro: tu
+    if (sp > 0.6) {
+      const d0 = Anim.clamp((t - tErr + 0.2) / 0.35);
+      if (d0 > 0) {
+        a += `<g transform="translate(1690,${560 - 30 * (1 - d0)}) scale(${0.7 * d0})">${Props.sheet({})}${[[-30, -200], [30, -150], [-10, -90]].map(([x, y], i) => { const u = Anim.clamp((t - tFirmi - i * 0.18) / 0.15); return u > 0 ? `<g transform="translate(${x},${y})">${Props.cross(1.6 * Anim.ease("back.out(3)")(u))}</g>` : ""; }).join("")}</g>`;
+        const sg = Anim.clamp((t - tErr) / (tFirmi - tErr + 0.3)), px = 1690 - 40 + 80 * sg, py = 470 + 18 * Math.sin(sg * 40);
+        if (sg < 1) a += `<g transform="translate(${px},${py}) rotate(28)">${Props.pen()}</g>`;
+      }
+      const r0 = Anim.clamp((t - tReg + 0.15) / 0.35), tear = Anim.ease("back.out(2)")(Anim.clamp((t - tViol) / 0.3));
+      if (r0 > 0) a += `<g transform="translate(1690,${880 + 40 * (1 - r0)}) scale(${0.95 * r0})">${Props.rulebook({ tear })}</g>`;
+      if (tear > 0) a += `<g transform="translate(1690,780) rotate(-12) scale(${0.6 + 0.4 * tear})" opacity="${tear}"><rect x="-130" y="-38" width="260" height="76" rx="10" fill="none" stroke="#c23a24" stroke-width="8"/><text y="18" text-anchor="middle" font-family="Inter" font-weight="800" font-size="48" letter-spacing="4" fill="#c23a24">VIOLATE</text></g>`;
+    }
+    a += Anim.shadow({ ...c, ground: 900 }, 120, sp > 0.5 ? "#000" : "#6b4a2a", 0.3);
+    a += Anim.place(Anim.contratto(c, t), c);
+    const cam = Anim.at(CAM, t); cam.x += Anim.shake(t, tEh + 0.45, 10, 0.3);
+    return { cam, actors: a };
+  });
+  Anim.drive(tl, DUR, update);
+  tl.fromTo("#rk-a", { opacity: 0, y: -40, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.35, ease: "expo.out" }, tAz - 0.1);
+  tl.fromTo("#rk-b", { opacity: 0, y: -40, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.35, ease: "expo.out" }, tTe - 0.1);
+  tl.to(["#rk-a", "#rk-b"], { opacity: 0, duration: 0.12 }, tEh - 0.14);
+  tl.fromTo("#rk-st", { opacity: 0, scale: 2.4, rotation: -22 }, { opacity: 1, scale: 1, rotation: -9, duration: 0.16, ease: "power4.in" }, tEh + 0.3);
+  tl.to("#rk-st", { opacity: 0, filter: "blur(6px)", duration: 0.18 }, DUR - 0.22);
+</script>

@@ -1,0 +1,59 @@
+<script>
+  // Scena 8 - La versione giusta. Stessa scrivania, sullo schermo l'assistente aziendale. Una campana di vetro scende e
+  // si posa con un tintinnio sull'azienda (portatile, Contratto, Mouse): "tenere il documento sotto una campana di vetro".
+  // "Uno strumento approvato": l'Assistente esce con calma dallo schermo e si appollaia sul portatile; la lavagnetta
+  // "Tre cose in piu'" (fuori dal vetro) viene timbrata sulle parole; "Persone formate": al Mouse cade in testa il tocco.
+  const w = (x, e) => W(0, x, e);
+  const tTre = w("tre"), tStr = w("strumento"), tPers = w("Persone");
+  const hits = [w("approvato", "end") - 0.08, w("chiare", "end") - 0.08, w("formate", "end") - 0.08];
+  // la bolla e' centrata sul gruppo (portatile+genio, Contratto, Mouse) con margine; la lavagnetta resta fuori, a destra
+  const DOME = { x: 820, y: 900, rx: 680, ry: 780 }, tLand = 1.0;
+  const BOARD = { x: 1712, y: 470, w: 400 };
+  const box = (i) => ({ x: BOARD.x - BOARD.w / 2 + 82, y: BOARD.y + 120 + i * 72 });
+  const inflate = (t) => Anim.ease("elastic.out(1, 0.6)")(Anim.clamp((t - 0.15) / 0.85));                      // si gonfia come una bolla
+  const wobble = (t) => t < 0.15 ? 0 : Math.sin((t - 0.15) * 13) * Math.exp(-(t - 0.15) * 2.2);
+  const MOUSE = { x: 1290, y: 868, s: 0.72 };
+  const KC = [
+    [0, { x: 960, y: 864, s: 1.2, by: -302, bc: 10, px: 0, py: 0, lx: -150, ly: -120, rx: 150, ry: -120, idleMouth: "rest", lid: 0 }],
+    [0.3, { py: -1, px: -0.2, open: 1.12, by: -312, bc: 16 }, "power2.out"],                        // guarda la campana che scende
+    [tLand + 0.15, { open: 1.05, sq: 0.95 }, "power2.out"], [tLand + 0.4, { py: 0, px: 0, open: 1, sq: 1, by: -304, bc: 12, idleMouth: "smile" }, "power2.out"],
+    [tStr, { px: -1, py: -0.4, turn: -0.2 }, "power2.out"],                                           // l'Assistente
+    [hits[0] - 0.4, { px: 1, py: -0.3, turn: 0.15 }, "power2.out"], [hits[2] - 0.6, { px: 0.8, py: 0.1 }, "power2.out"],   // la lavagnetta, poi il Mouse
+    [DUR, { px: 0.2, py: 0, turn: 0, idleMouth: "smile" }, "power2.inOut"],
+  ];
+  const KA = [[0, { mouth: "O", lx: -150, ly: -184, rx: 150, ry: -184, rh: "open", px: 0, open: 1 }],
+              [tStr + 0.75, { mouth: "smile", lx: -150, ly: -184, rx: 192, ry: -344, rh: "thumb", px: 0.5 }, "back.out(2)"]];
+  const assist = { t0: tStr - 0.55, T: 1.4, style: "gentle", color: "#5fb3a7", perch: { x: 465, y: 650, s: 0.9 }, phase: 1, render: (t) => Anim.assistente(Anim.at(KA, t), t) };
+  const capY = (t) => { const u = Anim.clamp((t - tPers + 0.15) / 0.38); return u >= 1 ? null : -700 * (1 - Anim.ease("power2.in")(u)); };
+  const update = Anim.stage($("svg.stage"), Scenes.office({ fx: false, screen: "azienda", warm: 1.2 }), Scenes.fx("warm"), (t) => {
+    const c = Anim.at(KC, t); c.blink = Anim.blinkAt([1.6, hits[1] + 0.5], t); c.mouth = MOUTH(t, c.idleMouth);
+    for (const h of hits) { const d = t - h; if (d >= 0 && d < 0.25) c.sq = d < 0.08 ? 0.95 : 1.02; }      // annuisce a ogni timbro
+    let a = `<g transform="translate(1470,230)">${Props.secondHand(t + 15)}</g><g transform="translate(1600,642)">${Props.steam(t)}</g>`;
+    a += Anim.genieOut(t, assist);                                                                         // l'Assistente esce dallo schermo
+    // il Mouse, gia' in azienda; sulla parola "Persone" gli cade in testa il tocco da laureato
+    const cy = capY(t), capped = t > tPers + 0.2 && cy === null;
+    const mm = { ...MOUSE, cap: capped, sweat: false, mouth: capped ? "smile" : "rest", px: capped ? -0.5 : -0.8, py: capped ? 0 : -0.3, lid: capped ? 0.3 : 0, ct: 4, cup: true };
+    if (capped) { const d = t - tPers - 0.2; if (d < 0.25) mm.sq = d < 0.08 ? 0.9 : 1.05; }
+    a += Anim.shadow({ ...mm, ground: 868 }, 100) + Anim.place(Anim.mouse(mm, t), mm);
+    if (t > tPers - 0.2 && cy !== null) a += `<g transform="translate(${MOUSE.x},${MOUSE.y - 238 * MOUSE.s + cy}) rotate(${-8 + cy * 0.04}) scale(${MOUSE.s})">${Props.mortarboard()}</g>`;
+    if (capped && t < tPers + 1.2) a += [[-120, -330], [110, -350]].map(([dx, dy], i) => `<g transform="translate(${MOUSE.x + dx * MOUSE.s},${MOUSE.y + dy * MOUSE.s}) rotate(${t * 120}) scale(${MOUSE.s * Anim.clamp(1 - (t - tPers - 0.2) / 1.0)})">${Props.sparkle(16, i ? "#fff" : Chars.P.brass)}</g>`).join("");
+    a += Anim.shadow({ ...c, ground: 864 }, 135) + Anim.place(Anim.contratto(c, t), c);
+    // la lavagnetta "Tre cose in piu'" scende sui fili (fuori dal vetro); il timbro spunta ogni casella sulla sua parola
+    const bd = Anim.ease("back.out(1.4)")(Anim.clamp((t - tTre + 0.1) / 0.55));
+    if (bd > 0) {
+      const checks = hits.map((h) => Anim.clamp((t - h) / 0.06)), lit = [w("Uno"), w("Regole"), w("Persone")].map((x) => Anim.clamp((t - x + 0.1) / 0.2));
+      a += `<g transform="translate(${BOARD.x},${BOARD.y - 620 * (1 - bd)}) rotate(${2 * Math.sin(t * 2.2) * (1 - Anim.clamp((t - tTre) / 3))})">${Props.checklist({ checks, lit, w: BOARD.w, fs: 25 })}</g>`;
+    }
+    let sx = 0, sy = 0, sh = -1;
+    hits.forEach((h, i) => { const { x, y } = box(i), d = t - h;
+      if (d > -0.5 && d < 0.35) { sh = i; sx = x; sy = d < -0.18 ? y - 220 : d < 0 ? y - 220 * Anim.ease("power3.in")(-d / 0.18) : d < 0.08 ? y : y - 220 * Anim.ease("power2.out")((d - 0.08) / 0.27); } });
+    if (sh >= 0) a += `<g transform="translate(${sx},${sy + 20}) scale(.8)">${Props.stamp()}</g>`;
+    // la bolla (davanti a tutto): si gonfia dal centro con un'oscillazione elastica, poi resta morbida
+    const glow = Math.max(0, 1 - Math.abs(t - 0.9) / 0.5) * 0.5 + 0.12 * Anim.clamp((t - tLand) / 0.5);
+    a += `<g transform="translate(${DOME.x},${DOME.y})">${Props.bubbleDome({ rx: DOME.rx, ry: DOME.ry, u: inflate(t), wob: wobble(t), glow })}</g>`;
+    if (t > 0.15 && t < 0.75) { const d = (t - 0.15) / 0.6; a += [0, 1, 2, 3, 4].map((i) => `<g transform="translate(${DOME.x + (i - 2) * 300 * d},${DOME.y - 200 - DOME.ry * 0.6 * d * (i % 2 ? 1 : 0.7)}) scale(${(1 - d) * 0.9})">${Props.sparkle(14, i % 2 ? "#fff" : "#8ff0d8")}</g>`).join(""); }
+    const cam = { x: 960, y: 560, z: 1.0 }; for (const h of hits) cam.y += Anim.shake(t, h, 4, 0.16);
+    return { cam, actors: a };
+  });
+  Anim.drive(tl, DUR, update);
+</script>

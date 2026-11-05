@@ -1,0 +1,5 @@
+{"command":"file.import","params":{"paths":["C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png","C:/Users/franc/progetto-p-Iva/video-badge-ai/docs/prove-craft/matte_test.mp4"]}}
+{"command":"comp.new","params":{"name":"Post","width":1920,"height":1080,"frameRate":30,"duration":3}}
+{"command":"layer.addItem","params":{"item":1}}
+{"command":"effect.apply","params":{"effect":"CC Vignette"}}
+{"command":"effect.apply","params":{"effect":"Add Grain"}}

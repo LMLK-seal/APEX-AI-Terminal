@@ -1,0 +1,88 @@
+<template>
+<style>
+  #giusta { position:absolute; inset:0; overflow:hidden; }
+  #giusta svg.stage { position:absolute; left:0; top:0; }
+
+  .tag { position:absolute; background:#f1ebde url(assets/paper.png); background-blend-mode:multiply; color:#1c2230;
+         box-shadow: 0 3px 0 rgba(60,40,20,.25), 0 14px 30px rgba(0,0,0,.28); border-radius:4px; }
+  .tag.cu { background-color:#b5562a; color:#fbf4ea; } .tag.navy { background-color:#16233a; color:#f1ebde; }
+  .lbl { font-family:'Inter'; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+  .ttl { font-family:'EB Garamond'; font-weight:700; }
+  .mono { font-family:'IBM Plex Mono'; font-weight:700; }
+
+</style>
+<div id="giusta" data-composition-id="giusta" data-width="1920" data-height="1080">
+  <svg class="stage" width="1920" height="1080" viewBox="0 0 1920 1080" data-layout-ignore></svg>
+
+</div>
+<script>
+(function () {
+  const SID = "giusta", DUR = 8.688, S0 = 64.606;
+  const LINES = [{"scene": "buongiorno", "start": 2.0, "end": 8.699, "caption": "Buongiorno! Sono un contratto. Tre pagine, due firme… e parecchi dati riservati.", "pauses": [[0.0, 4.4], [4.736, 6.699]], "speech": 6.699, "words": [{"w": "Buongiorno!", "start": 1.88, "end": 2.8}, {"w": "Sono", "start": 2.9, "end": 3.16}, {"w": "un", "start": 3.16, "end": 3.32}, {"w": "contratto.", "start": 3.32, "end": 4.12}, {"w": "Tre", "start": 4.4, "end": 4.62}, {"w": "pagine,", "start": 4.62, "end": 5.18}, {"w": "due", "start": 5.42, "end": 5.6}, {"w": "firme…", "start": 5.6, "end": 6.56}, {"w": "e", "start": 6.56, "end": 6.86}, {"w": "parecchi", "start": 6.86, "end": 7.5}, {"w": "dati", "start": 7.5, "end": 7.84}, {"w": "riservati.", "start": 7.84, "end": 8.56}]}, {"scene": "fretta", "start": 9.799, "end": 12.359, "caption": "Ore nove e quindici. Qualcuno ha fretta.", "pauses": [[0.0, 2.56]], "speech": 2.56, "words": [{"w": "Ore", "start": 9.615, "end": 9.995}, {"w": "nove", "start": 9.995, "end": 10.175}, {"w": "e", "start": 10.175, "end": 10.835}, {"w": "quindici.", "start": 10.175, "end": 10.835}, {"w": "Qualcuno", "start": 11.295, "end": 11.715}, {"w": "ha", "start": 11.715, "end": 11.835}, {"w": "fretta.", "start": 11.835, "end": 12.295}]}, {"scene": "fretta", "start": 13.409, "end": 17.487, "caption": "Mi copia… e mi incolla in un chatbot trovato online.", "pauses": [[0.0, 1.04], [1.472, 4.078]], "speech": 4.078, "words": [{"w": "Mi", "start": 13.385, "end": 13.625}, {"w": "copia…", "start": 13.625, "end": 14.285}, {"w": "e", "start": 14.285, "end": 14.985}, {"w": "mi", "start": 14.985, "end": 15.145}, {"w": "incolla", "start": 15.145, "end": 15.585}, {"w": "in", "start": 15.585, "end": 15.665}, {"w": "un", "start": 15.665, "end": 15.785}, {"w": "chatbot", "start": 15.785, "end": 16.345}, {"w": "trovato", "start": 16.345, "end": 16.845}, {"w": "online.", "start": 16.845, "end": 17.265}]}, {"scene": "fretta", "start": 18.837, "end": 20.693, "caption": "Gratis. Che fortuna.", "pauses": [[0.0, 1.856]], "speech": 1.856, "words": [{"w": "Gratis.", "start": 18.837, "end": 19.417}, {"w": "Che", "start": 19.417, "end": 19.597}, {"w": "fortuna.", "start": 19.597, "end": 20.217}]}, {"scene": "nessuno", "start": 21.893, "end": 29.283, "caption": "Nessuno l'ha vietato. Nessuno l'ha autorizzato. Diciamo che… nessuno ha chiesto.", "pauses": [[0.0, 2.992], [4.96, 7.39]], "speech": 7.39, "words": [{"w": "Nessuno", "start": 21.837, "end": 22.257}, {"w": "l'ha", "start": 22.257, "end": 22.377}, {"w": "vietato.", "start": 22.417, "end": 22.857}, {"w": "Nessuno", "start": 23.317, "end": 23.717}, {"w": "l'ha", "start": 23.717, "end": 23.897}, {"w": "autorizzato.", "start": 23.957, "end": 24.717}, {"w": "Diciamo", "start": 26.437, "end": 27.277}, {"w": "che…", "start": 27.277, "end": 27.537}, {"w": "nessuno", "start": 27.537, "end": 28.557}, {"w": "ha", "start": 28.557, "end": 28.717}, {"w": "chiesto.", "start": 28.717, "end": 29.257}]}, {"scene": "viaggio", "start": 30.983, "end": 32.64, "caption": "Trenta secondi, ed è fatto.", "pauses": [[0.0, 1.657]], "speech": 1.657, "words": [{"w": "Trenta", "start": 30.863, "end": 31.143}, {"w": "secondi,", "start": 31.143, "end": 31.863}, {"w": "ed", "start": 31.863, "end": 32.063}, {"w": "è", "start": 32.063, "end": 32.183}, {"w": "fatto.", "start": 32.183, "end": 32.363}]}, {"scene": "viaggio", "start": 34.49, "end": 38.615, "caption": "Peccato che adesso io sia qui. Non so nemmeno in che paese.", "pauses": [[0.0, 2.064], [2.4, 4.125]], "speech": 4.125, "words": [{"w": "Peccato", "start": 34.434, "end": 35.054}, {"w": "che", "start": 35.054, "end": 35.194}, {"w": "adesso", "start": 35.194, "end": 35.514}, {"w": "io", "start": 35.514, "end": 35.774}, {"w": "sia", "start": 35.774, "end": 35.974}, {"w": "qui.", "start": 35.974, "end": 36.294}, {"w": "Non", "start": 36.874, "end": 37.114}, {"w": "so", "start": 37.114, "end": 37.334}, {"w": "nemmeno", "start": 37.334, "end": 37.734}, {"w": "in", "start": 37.734, "end": 37.814}, {"w": "che", "start": 37.814, "end": 37.934}, {"w": "paese.", "start": 37.934, "end": 38.434}]}, {"scene": "nome", "start": 39.415, "end": 41.778, "caption": "Questa si chiama Shadow AI.", "pauses": [[0.0, 2.363]], "speech": 2.363, "words": [{"w": "Questa", "start": 39.295, "end": 39.815}, {"w": "si", "start": 39.815, "end": 40.155}, {"w": "chiama", "start": 40.155, "end": 40.415}, {"w": "Shadow", "start": 40.415, "end": 40.995}, {"w": "AI.", "start": 40.995, "end": 41.435}]}, {"scene": "rischio", "start": 43.878, "end": 58.147, "caption": "E il rischio è doppio. Per l'azienda: dati dei clienti esposti, informazioni riservate fuori controllo. Per te: errori che firmi tu, e regole aziendali violate.", "pauses": [[0.0, 2.192], [2.656, 8.432], [9.216, 9.84], [10.016, 14.269]], "speech": 14.269, "words": [{"w": "E", "start": 43.726, "end": 44.046}, {"w": "il", "start": 44.046, "end": 44.266}, {"w": "rischio", "start": 44.266, "end": 44.786}, {"w": "è", "start": 44.786, "end": 45.266}, {"w": "doppio.", "start": 45.266, "end": 45.946}, {"w": "Per", "start": 46.566, "end": 46.666}, {"w": "l'azienda:", "start": 46.666, "end": 46.846}, {"w": "dati", "start": 47.846, "end": 48.186}, {"w": "dei", "start": 48.186, "end": 48.306}, {"w": "clienti", "start": 48.306, "end": 48.766}, {"w": "esposti,", "start": 48.766, "end": 49.466}, {"w": "informazioni", "start": 49.786, "end": 50.406}, {"w": "riservate", "start": 50.406, "end": 51.106}, {"w": "fuori", "start": 51.286, "end": 51.506}, {"w": "controllo.", "start": 51.506, "end": 52.166}, {"w": "Per", "start": 53.126, "end": 53.286}, {"w": "te:", "start": 53.286, "end": 53.546}, {"w": "errori", "start": 54.226, "end": 54.686}, {"w": "che", "start": 54.686, "end": 54.786}, {"w": "firmi", "start": 54.786, "end": 55.246}, {"w": "tu,", "start": 55.246, "end": 55.466}, {"w": "e", "start": 55.466, "end": 55.986}, {"w": "regole", "start": 55.986, "end": 56.406}, {"w": "aziendali", "start": 56.406, "end": 57.166}, {"w": "violate.", "start": 57.166, "end": 57.986}]}, {"scene": "rischio", "start": 59.097, "end": 60.681, "caption": "Firmate da te, eh.", "pauses": [[0.0, 1.584]], "speech": 1.584, "words": [{"w": "Firmate", "start": 58.913, "end": 59.613}, {"w": "da", "start": 59.613, "end": 59.833}, {"w": "te,", "start": 59.833, "end": 60.193}, {"w": "eh.", "start": 60.293, "end": 60.533}]}, {"scene": "riavvolgi", "start": 62.381, "end": 63.606, "caption": "Riavvolgiamo.", "pauses": [[0.0, 1.225]], "speech": 1.225, "words": [{"w": "Riavvolgiamo.", "start": 62.325, "end": 63.265}]}, {"scene": "giusta", "start": 65.906, "end": 72.794, "caption": "Stessa azienda, tre cose in più. Uno strumento approvato. Regole chiare. Persone formate.", "pauses": [[0.0, 2.352], [2.656, 4.144], [4.352, 5.456], [5.568, 6.888]], "speech": 6.888, "words": [{"w": "Stessa", "start": 65.818, "end": 66.338}, {"w": "azienda,", "start": 66.338, "end": 66.958}, {"w": "tre", "start": 66.958, "end": 67.358}, {"w": "cose", "start": 67.358, "end": 67.698}, {"w": "in", "start": 67.698, "end": 67.858}, {"w": "più.", "start": 67.858, "end": 68.098}, {"w": "Uno", "start": 68.098, "end": 68.738}, {"w": "strumento", "start": 68.738, "end": 69.278}, {"w": "approvato.", "start": 69.278, "end": 69.918}, {"w": "Regole", "start": 69.918, "end": 70.698}, {"w": "chiare.", "start": 70.698, "end": 71.198}, {"w": "Persone", "start": 71.198, "end": 71.878}, {"w": "formate.", "start": 71.878, "end": 72.598}]}, {"scene": "finale", "start": 73.994, "end": 78.397, "caption": "Il lavoro si fa lo stesso, in trenta secondi. E io… resto a casa.", "pauses": [[0.0, 2.48], [2.688, 3.216], [3.456, 4.403]], "speech": 4.403, "words": [{"w": "Il", "start": 73.746, "end": 73.986}, {"w": "lavoro", "start": 73.986, "end": 74.206}, {"w": "si", "start": 74.206, "end": 74.406}, {"w": "fa", "start": 74.406, "end": 74.566}, {"w": "lo", "start": 74.566, "end": 74.686}, {"w": "stesso,", "start": 74.686, "end": 75.046}, {"w": "in", "start": 75.046, "end": 75.426}, {"w": "trenta", "start": 75.426, "end": 75.766}, {"w": "secondi.", "start": 75.766, "end": 76.566}, {"w": "E", "start": 76.566, "end": 76.826}, {"w": "io…", "start": 76.826, "end": 77.086}, {"w": "resto", "start": 77.086, "end": 77.706}, {"w": "a", "start": 77.706, "end": 77.926}, {"w": "casa.", "start": 77.926, "end": 78.126}]}];
+  const L = LINES.filter((l) => l.scene === SID).map((l) => ({ ...l, a: l.start - S0, b: l.end - S0 }));
+  const W = (i, word, edge = "start") => Anim.wordTime(L[i], word, edge) - S0;      // istante locale di una parola
+  const MOUTH = (t, idle = "rest") => Anim.mouthAt(LINES, S0 + t, idle);           // lip-sync del Contratto
+  const $ = (s) => document.querySelector("#giusta " + s);
+  const tl = gsap.timeline({ paused: true });
+
+// Scena 8 - La versione giusta. Stessa scrivania, sullo schermo l'assistente aziendale. Una campana di vetro scende e
+  // si posa con un tintinnio sull'azienda (portatile, Contratto, Mouse): "tenere il documento sotto una campana di vetro".
+  // "Uno strumento approvato": l'Assistente esce con calma dallo schermo e si appollaia sul portatile; la lavagnetta
+  // "Tre cose in piu'" (fuori dal vetro) viene timbrata sulle parole; "Persone formate": al Mouse cade in testa il tocco.
+  const w = (x, e) => W(0, x, e);
+  const tTre = w("tre"), tStr = w("strumento"), tPers = w("Persone");
+  const hits = [w("approvato", "end") - 0.08, w("chiare", "end") - 0.08, w("formate", "end") - 0.08];
+  // la bolla e' centrata sul gruppo (portatile+genio, Contratto, Mouse) con margine; la lavagnetta resta fuori, a destra
+  const DOME = { x: 820, y: 900, rx: 680, ry: 780 }, tLand = 1.0;
+  const BOARD = { x: 1712, y: 470, w: 400 };
+  const box = (i) => ({ x: BOARD.x - BOARD.w / 2 + 82, y: BOARD.y + 120 + i * 72 });
+  const inflate = (t) => Anim.ease("elastic.out(1, 0.6)")(Anim.clamp((t - 0.15) / 0.85));                      // si gonfia come una bolla
+  const wobble = (t) => t < 0.15 ? 0 : Math.sin((t - 0.15) * 13) * Math.exp(-(t - 0.15) * 2.2);
+  const MOUSE = { x: 1290, y: 868, s: 0.72 };
+  const KC = [
+    [0, { x: 960, y: 864, s: 1.2, by: -302, bc: 10, px: 0, py: 0, lx: -150, ly: -120, rx: 150, ry: -120, idleMouth: "rest", lid: 0 }],
+    [0.3, { py: -1, px: -0.2, open: 1.12, by: -312, bc: 16 }, "power2.out"],                        // guarda la campana che scende
+    [tLand + 0.15, { open: 1.05, sq: 0.95 }, "power2.out"], [tLand + 0.4, { py: 0, px: 0, open: 1, sq: 1, by: -304, bc: 12, idleMouth: "smile" }, "power2.out"],
+    [tStr, { px: -1, py: -0.4, turn: -0.2 }, "power2.out"],                                           // l'Assistente
+    [hits[0] - 0.4, { px: 1, py: -0.3, turn: 0.15 }, "power2.out"], [hits[2] - 0.6, { px: 0.8, py: 0.1 }, "power2.out"],   // la lavagnetta, poi il Mouse
+    [DUR, { px: 0.2, py: 0, turn: 0, idleMouth: "smile" }, "power2.inOut"],
+  ];
+  const KA = [[0, { mouth: "O", lx: -150, ly: -184, rx: 150, ry: -184, rh: "open", px: 0, open: 1 }],
+              [tStr + 0.75, { mouth: "smile", lx: -150, ly: -184, rx: 192, ry: -344, rh: "thumb", px: 0.5 }, "back.out(2)"]];
+  const assist = { t0: tStr - 0.55, T: 1.4, style: "gentle", color: "#5fb3a7", perch: { x: 465, y: 650, s: 0.9 }, phase: 1, render: (t) => Anim.assistente(Anim.at(KA, t), t) };
+  const capY = (t) => { const u = Anim.clamp((t - tPers + 0.15) / 0.38); return u >= 1 ? null : -700 * (1 - Anim.ease("power2.in")(u)); };
+  const update = Anim.stage($("svg.stage"), Scenes.office({ fx: false, screen: "azienda", warm: 1.2 }), Scenes.fx("warm"), (t) => {
+    const c = Anim.at(KC, t); c.blink = Anim.blinkAt([1.6, hits[1] + 0.5], t); c.mouth = MOUTH(t, c.idleMouth);
+    for (const h of hits) { const d = t - h; if (d >= 0 && d < 0.25) c.sq = d < 0.08 ? 0.95 : 1.02; }      // annuisce a ogni timbro
+    let a = `<g transform="translate(1470,230)">${Props.secondHand(t + 15)}</g><g transform="translate(1600,642)">${Props.steam(t)}</g>`;
+    a += Anim.genieOut(t, assist);                                                                         // l'Assistente esce dallo schermo
+    // il Mouse, gia' in azienda; sulla parola "Persone" gli cade in testa il tocco da laureato
+    const cy = capY(t), capped = t > tPers + 0.2 && cy === null;
+    const mm = { ...MOUSE, cap: capped, sweat: false, mouth: capped ? "smile" : "rest", px: capped ? -0.5 : -0.8, py: capped ? 0 : -0.3, lid: capped ? 0.3 : 0, ct: 4, cup: true };
+    if (capped) { const d = t - tPers - 0.2; if (d < 0.25) mm.sq = d < 0.08 ? 0.9 : 1.05; }
+    a += Anim.shadow({ ...mm, ground: 868 }, 100) + Anim.place(Anim.mouse(mm, t), mm);
+    if (t > tPers - 0.2 && cy !== null) a += `<g transform="translate(${MOUSE.x},${MOUSE.y - 238 * MOUSE.s + cy}) rotate(${-8 + cy * 0.04}) scale(${MOUSE.s})">${Props.mortarboard()}</g>`;
+    if (capped && t < tPers + 1.2) a += [[-120, -330], [110, -350]].map(([dx, dy], i) => `<g transform="translate(${MOUSE.x + dx * MOUSE.s},${MOUSE.y + dy * MOUSE.s}) rotate(${t * 120}) scale(${MOUSE.s * Anim.clamp(1 - (t - tPers - 0.2) / 1.0)})">${Props.sparkle(16, i ? "#fff" : Chars.P.brass)}</g>`).join("");
+    a += Anim.shadow({ ...c, ground: 864 }, 135) + Anim.place(Anim.contratto(c, t), c);
+    // la lavagnetta "Tre cose in piu'" scende sui fili (fuori dal vetro); il timbro spunta ogni casella sulla sua parola
+    const bd = Anim.ease("back.out(1.4)")(Anim.clamp((t - tTre + 0.1) / 0.55));
+    if (bd > 0) {
+      const checks = hits.map((h) => Anim.clamp((t - h) / 0.06)), lit = [w("Uno"), w("Regole"), w("Persone")].map((x) => Anim.clamp((t - x + 0.1) / 0.2));
+      a += `<g transform="translate(${BOARD.x},${BOARD.y - 620 * (1 - bd)}) rotate(${2 * Math.sin(t * 2.2) * (1 - Anim.clamp((t - tTre) / 3))})">${Props.checklist({ checks, lit, w: BOARD.w, fs: 25 })}</g>`;
+    }
+    let sx = 0, sy = 0, sh = -1;
+    hits.forEach((h, i) => { const { x, y } = box(i), d = t - h;
+      if (d > -0.5 && d < 0.35) { sh = i; sx = x; sy = d < -0.18 ? y - 220 : d < 0 ? y - 220 * Anim.ease("power3.in")(-d / 0.18) : d < 0.08 ? y : y - 220 * Anim.ease("power2.out")((d - 0.08) / 0.27); } });
+    if (sh >= 0) a += `<g transform="translate(${sx},${sy + 20}) scale(.8)">${Props.stamp()}</g>`;
+    // la bolla (davanti a tutto): si gonfia dal centro con un'oscillazione elastica, poi resta morbida
+    const glow = Math.max(0, 1 - Math.abs(t - 0.9) / 0.5) * 0.5 + 0.12 * Anim.clamp((t - tLand) / 0.5);
+    a += `<g transform="translate(${DOME.x},${DOME.y})">${Props.bubbleDome({ rx: DOME.rx, ry: DOME.ry, u: inflate(t), wob: wobble(t), glow })}</g>`;
+    if (t > 0.15 && t < 0.75) { const d = (t - 0.15) / 0.6; a += [0, 1, 2, 3, 4].map((i) => `<g transform="translate(${DOME.x + (i - 2) * 300 * d},${DOME.y - 200 - DOME.ry * 0.6 * d * (i % 2 ? 1 : 0.7)}) scale(${(1 - d) * 0.9})">${Props.sparkle(14, i % 2 ? "#fff" : "#8ff0d8")}</g>`).join(""); }
+    const cam = { x: 960, y: 560, z: 1.0 }; for (const h of hits) cam.y += Anim.shake(t, h, 4, 0.16);
+    return { cam, actors: a };
+  });
+  Anim.drive(tl, DUR, update);
+  window.__timelines[SID] = tl;
+})();
+</script>
+</template>

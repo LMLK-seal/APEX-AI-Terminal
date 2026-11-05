@@ -1,0 +1,267 @@
+file.new={"blank": true, "size": [960, 540]}
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "1. Scena: buongiorno  (6.2 s)\nBuongiorno. Sono il badge di Nodomatic. Qui dentro entra solo chi è autorizzato.\nRecitazione: fiero, da portiere puntiglioso\nInquadratura: Campo medio frontale, badge al centro; leggero push-in\nSuono: Ambiente ufficio, passi, tintinnio del clip"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 29]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 80]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 43]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 68]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 50]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "2. Scena: buongiorno  (6.2 s)\nPersone, pacchi… e da qualche tempo, anche le intelligenze artificiali.\nRecitazione: ironico\nInquadratura: Primo piano badge, sguardo in camera; poi panoramica sulla stanza\nSuono: Pacchi che strisciano, 'ding' digitale leggero"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 29]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 71]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 20]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 79]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 53]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "3. Scena: porta  (4.1 s)\nCopilot, con l'account aziendale: prego, entri pure.\nRecitazione: cortese\nInquadratura: Campo medio a due: badge a sinistra, genio Copilot sulla soglia\nSuono: Bip di consenso del lettore badge, porta che scatta"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 24]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 52]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 20]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 77]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 58]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "4. Scena: porta  (6.0 s)\nClaude: solo con chi ha la licenza. Il nome sul badge deve essere il tuo.\nRecitazione: preciso, alza un dito\nInquadratura: Mezzo busto badge con dito alzato; stacco sul genio Claude (teal)\nSuono: Bip di consenso, 'tic' del dito"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 24]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 73]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 34]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 79]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 38]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "5. Scena: fretta  (3.1 s)\nOre nove e quindici. Qualcuno ha fretta.\nRecitazione: allarmato\nInquadratura: Piano d'insieme dell'ufficio, orologio 9:15 in primo piano; zoom su Mouse\nSuono: Tic-tac accelerato, tazza che trema"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 25]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 40]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 22]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 87]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 42]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "6. Scena: fretta  (8.5 s)\nE dalla finestra entra un amico famoso: ChatGPT. Poi Perplexity. Tutti gratis, tutti simpatici.\nRecitazione: sarcastico\nInquadratura: Campo largo sulla finestra che si apre; due ingressi dal davanzale\nSuono: Finestra che sbatte, fanfara comica 'gratis', ronzio"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 25]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 95]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 23]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 80]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 59]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "7. Scena: porta-sbagliata  (5.8 s)\nOppure Claude, sì… ma con l'account personale. Stesso nome, porta sbagliata.\nRecitazione: sopracciglio alzato\nInquadratura: Primo piano badge con sopracciglio alzato; inserto sul genio Claude (account personale, giallo)\nSuono: Allarme breve del lettore badge, buzzer sbagliato"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 34]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 76]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 32]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 109]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 56]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "8. Scena: nessuno  (5.5 s)\nTanto è solo un riassunto. Tanto lo usano tutti. Tanto… chi controlla?\nRecitazione: imita le scuse, poi pausa\nInquadratura: Primo piano Mouse che si giustifica, rapido; poi pausa fissa sul badge\nSuono: Voce/mormorio di scuse, silenzio di mezzo secondo"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 26]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 70]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 38]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 84]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 56]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "9. Scena: viaggio  (4.9 s)\nIl file esce. Senza badge, senza registro. E non torna indietro.\nRecitazione: secco\nInquadratura: Campo medio sul file-documento che esce dalla finestra nella notte (freddo, navy)\nSuono: Whoosh, sirena lontana, LED rosso che pulsa"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 26]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 64]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 18]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 95]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 50]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "10. Scena: nome  (6.2 s)\nQuesto si chiama: strumento non autorizzato. Anche se è famoso. Anche se è gratis.\nRecitazione: scandito\nInquadratura: Piano medio badge a figura intera, titolo grafico 'strumento non autorizzato' sovraimpresso\nSuono: Colpo secco di timbro, sting musicale"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 24]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 82]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 21]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 105]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 44]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "11. Scena: rischio  (8.6 s)\nPer l'azienda: dati dei clienti fuori controllo. Per te: regole aziendali violate. E sul badge c'è il tuo nome.\nRecitazione: serio, poi ammicca\nInquadratura: Primo piano badge che si volta verso il proprio nome; stacco su server con LED rossi\nSuono: Tono basso, ronzio server, 'ding' sul nome"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 27]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 111]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 31]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 98]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 49]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "12. Scena: riavvolgi  (1.0 s)\nRiavvolgiamo.\nRecitazione: deciso\nInquadratura: Effetto rewind: stessa inquadratura dell'apertura scorre indietro\nSuono: Nastro che si riavvolge, whoosh inverso"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 29]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 13]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 19]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 79]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 46]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "13. Scena: giusta  (10.7 s)\nTre regole. Uno: Copilot, con l'account aziendale. Due: Claude, solo se la licenza è tua. Tre: per tutto il resto, prima si chiede all'IT.\nRecitazione: chiaro, ritmato\nInquadratura: Tre inquadrature a elenco: genio Copilot / genio Claude / badge con IT\nSuono: Tre 'ding' ritmati, musica positiva in entrata"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 27]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 138]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 28]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 84]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 53]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit
+slide.new={"layout": "blank"}
+design.background={"color": "#F4EBD9"}
+insert.picture={"path": "C:/Users/franc/progetto-p-Iva/video-badge-ai/storyboard/panels/prova.png", "rect": [24, 40, 620, 349]}
+insert.textBox={"rect": [664, 40, 272, 460], "text": "14. Scena: finale  (5.1 s)\nStesso lavoro, stessa velocità. E io… non devo cacciare nessuno.\nRecitazione: soddisfatto\nInquadratura: Campo medio ufficio caldo, tutti i personaggi rilassati; chiusura sul badge\nSuono: Musica di chiusura, bip di consenso, tintinnio finale"}
+text.edit
+text.select={"anchor": [0, 0], "caret": [0, 26]}
+format.size={"size": 20}
+format.bold={"on": true}
+text.select={"anchor": [1, 0], "caret": [1, 64]}
+format.size={"size": 15}
+text.select={"anchor": [2, 0], "caret": [2, 24]}
+format.size={"size": 12}
+format.italic={"on": true}
+text.select={"anchor": [3, 0], "caret": [3, 89]}
+format.size={"size": 11}
+text.select={"anchor": [4, 0], "caret": [4, 60]}
+format.size={"size": 11}
+format.color={"color": "#B03030"}
+text.exit

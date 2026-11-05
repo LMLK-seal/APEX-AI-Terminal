@@ -1,0 +1,13 @@
+# dipendenze e cache (rigenerabili)
+__pycache__/
+cartoon/hf/.hyperframes/
+cartoon/hf/assets/audio/
+audio/cartoon_music.wav
+audio/cartoon_sfx.wav
+audio/cartoon_voice.wav
+# ambiente della sessione (tools/setup_sessione.sh)
+.venv/
+.tools/
+# battute ElevenLabs prima della velocita' (tools/eleven_tts.py tempo): a 1x sono uguali ad audio/eleven/NN.wav
+audio/eleven/raw/
+design/*-master.mp4

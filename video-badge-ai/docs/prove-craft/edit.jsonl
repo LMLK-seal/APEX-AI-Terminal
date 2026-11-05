@@ -1,0 +1,7 @@
+{"id":"file.newProject","params":{"name":"edit"}}
+{"id":"file.newSequence","params":{"name":"seq","width":1920,"height":1080,"fps":30}}
+{"id":"file.import","params":{"paths":["C:/Users/franc/progetto-p-Iva/video-badge-ai/docs/prove-craft/matte_test.mp4","C:/Users/franc/progetto-p-Iva/video-badge-ai/docs/prove-craft/voce_test.wav","C:/Users/franc/progetto-p-Iva/video-badge-ai/docs/prove-craft/musica_test.wav"]}}
+{"id":"timeline.place","params":{"item":8,"track":"V1","seconds":0}}
+{"id":"timeline.place","params":{"item":9,"track":"A2","seconds":1}}
+{"id":"timeline.place","params":{"item":10,"track":"A3","seconds":0}}
+{"id":"file.exportMedia","params":{"path":"C:/Users/franc/progetto-p-Iva/video-badge-ai/docs/prove-craft/frame_%05d.png","format":"png","range":"custom","startSeconds":1,"endSeconds":1.04,"audio":false,"wait":true}}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Sono un contratto · Usare l'IA in sicurezza · Lezione 3</title>
+    <script src="assets/gsap.min.js"></script>
+    <script src="assets/characters.js"></script>
+    <script src="assets/chatbots.js"></script>
+    <script src="assets/props.js"></script>
+    <script src="assets/scenes.js"></script>
+    <script src="assets/anim.js"></script>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1920px; height:1080px; overflow:hidden; background:#141f2e; }
+      #root { position:relative; width:1920px; height:1080px; overflow:hidden; background:#141f2e; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="83.297" data-width="1920" data-height="1080" data-fps="30">
+      <audio id="a-voice" class="clip" src="assets/audio/voice.wav" data-start="0" data-duration="83.297" data-track-index="11" data-volume="1"></audio>
+      <audio id="a-music" class="clip" src="assets/audio/music.wav" data-start="0" data-duration="83.297" data-track-index="12" data-volume="0.5"></audio>
+      <audio id="a-sfx" class="clip" src="assets/audio/sfx.wav" data-start="0" data-duration="83.297" data-track-index="13" data-volume="0.85"></audio>
+      <div id="buongiorno" data-composition-id="buongiorno" data-composition-src="compositions/buongiorno.html" data-start="0.000" data-duration="9.299" data-track-index="20" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:10"></div>
+      <div id="fretta" data-composition-id="fretta" data-composition-src="compositions/fretta.html" data-start="9.299" data-duration="12.094" data-track-index="21" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:11"></div>
+      <div id="nessuno" data-composition-id="nessuno" data-composition-src="compositions/nessuno.html" data-start="21.393" data-duration="8.590" data-track-index="22" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:12"></div>
+      <div id="viaggio" data-composition-id="viaggio" data-composition-src="compositions/viaggio.html" data-start="29.983" data-duration="9.132" data-track-index="23" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:13"></div>
+      <div id="nome" data-composition-id="nome" data-composition-src="compositions/nome.html" data-start="39.115" data-duration="4.163" data-track-index="24" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:14"></div>
+      <div id="rischio" data-composition-id="rischio" data-composition-src="compositions/rischio.html" data-start="43.278" data-duration="18.103" data-track-index="25" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:15"></div>
+      <div id="riavvolgi" data-composition-id="riavvolgi" data-composition-src="compositions/riavvolgi.html" data-start="61.381" data-duration="3.225" data-track-index="26" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:16"></div>
+      <div id="giusta" data-composition-id="giusta" data-composition-src="compositions/giusta.html" data-start="64.606" data-duration="8.688" data-track-index="27" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:17"></div>
+      <div id="finale" data-composition-id="finale" data-composition-src="compositions/finale.html" data-start="73.294" data-duration="6.403" data-track-index="28" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:18"></div>
+      <div id="cartello" data-composition-id="cartello" data-composition-src="compositions/cartello.html" data-start="79.697" data-duration="3.600" data-track-index="29" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:19"></div>
+      <div id="captions" data-composition-id="captions" data-composition-src="compositions/captions.html" data-start="0.000" data-duration="83.297" data-track-index="30" data-track-kind="captions" data-width="1920" data-height="1080" style="z-index:20"></div>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+{"actions":[
+ ["image.imageSize",{"width":1920,"resample":"lanczos"}],
+ ["image.adjustments.photoFilter",{"filter":"sepia","density":20}],
+ ["filter.noise.addNoise",{"amount":4,"distribution":"gaussian","monochromatic":true,"seed":7}]
+]}

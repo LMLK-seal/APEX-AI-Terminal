@@ -1,0 +1,3 @@
+{"command":"essential.addProperty","params":{"comp":1,"layer":2,"path":"text/sourceText","name":"Titolo"}}
+{"command":"essential.addProperty","params":{"comp":1,"layer":2,"path":"transform/position","name":"Posizione"}}
+{"command":"essential.exportTemplate","params":{"comp":1,"path":"C:/Users/franc/progetto-p-Iva/video-badge-ai/docs/prove-craft/titolo.ectemplate","name":"Titolo card"}}

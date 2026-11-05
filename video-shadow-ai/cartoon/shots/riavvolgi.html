@@ -1,0 +1,36 @@
+  <div id="rw-tag" class="tag ttl" style="left:0; right:0; margin:auto; width:720px; top:120px; padding:14px 0 8px; text-align:center; font-size:96px"><span style="color:#9a3f17">◀◀</span> Riavvolgiamo</div>
+<script>
+  // Scena 7 - Riavvolgiamo. Tutto torna indietro di corsa (righe del nastro, lancetta all'indietro): la copia esce dallo
+  // schermo e rientra nel Contratto, ChatGratis sprofonda nel portatile, il Mouse scappa all'indietro. Poi tutto si ferma.
+  const SCR = { x: 465, y: 602 }, tR = L[0].a, tEnd = tR + 0.95;
+  const back = (t, a, b) => Anim.ease("power2.inOut")(Anim.clamp((t - a) / (b - a)));
+  const update = Anim.stage($("svg.stage"), Scenes.office({ fx: false }), Scenes.fx("warm"), (t) => {
+    const u = back(t, 0.05, tEnd);                                   // avanzamento del riavvolgimento (0 -> 1)
+    const c = { x: 1000, y: 864, s: 1.22, by: -302, bc: 10, lx: -150, ly: -120, rx: 150, ry: -120, idleMouth: "rest" };
+    if (t > tR - 0.25) Object.assign(c, { rh: "point", rx: 175, ry: -250, rb: -0.25, px: -0.6, by: -308, bc: 12 });   // "Riavvolgiamo!" deciso
+    if (t > tEnd + 0.2) Object.assign(c, { rh: "open", rx: 150, ry: -120, px: 0, lid: 0.15, idleMouth: "smile" });
+    c.mouth = MOUTH(t, c.idleMouth); c.blink = Anim.blinkAt([tEnd + 0.5], t);
+    let a = `<g transform="translate(1470,230)">${Props.secondHand(30 - u * 40)}</g><g transform="translate(1600,642)">${Props.steam(2 - t)}</g>`;
+    // ChatGratis che sprofonda nello schermo
+    a += Anim.genieOut(t, { t0: 0.05, T: 0.55, style: "burst", color: "#ffd23f", reverse: true, perch: { x: 465, y: 650, s: 0.95 },
+                          render: (tt) => Anim.chatgratis({ rx: 222, ry: -250, rh: "thumb", px: 1 }, tt) });
+    a += Anim.shadow({ ...c, ground: 864 }, 135);
+    a += Anim.place(Anim.contratto(c, t), c);
+    // la copia che rientra (arco al contrario)
+    const k = back(t, 0.25, 0.95);
+    if (k < 0.99) { const x = Anim.lerp(SCR.x, 1000, k), y = Anim.lerp(SCR.y + 40, 864, k) - Math.sin(k * Math.PI) * 260;
+      a += `<g filter="url(#fxCopy)">${Anim.place(Anim.contratto({ open: 1.15, by: -312, bc: 16, mouth: "O", idle: 0 }, t), { x, y, s: 0.2 + 0.8 * k, r: 340 * (1 - k), o: 1 - 0.8 * k })}</g>`; }
+    // il Mouse che corre all'indietro fuori campo
+    const m = back(t, 0.15, 1.0);
+    if (m < 0.99) a += Anim.place(Anim.mouse({ px: -0.8, stride: -t * 26 }, t), { x: 1440 + 900 * m, y: 868 - Math.abs(Math.sin(t * 13)) * 16, s: 0.95, r: 10 });
+    // righe del nastro + leggera desaturazione mentre si riavvolge
+    const tape = Anim.clamp(1 - Math.abs((t - (0.05 + tEnd) / 2) / ((tEnd - 0.05) / 2 + 0.15)) ** 6);
+    let over = "";
+    if (tape > 0.02) { over += `<rect width="1920" height="1080" fill="#1c2230" opacity="${0.22 * tape}"/>`;
+      for (let i = 0; i < 9; i++) { const y = ((i * 137 + t * 2600) % 1180) - 50; over += `<rect x="0" y="${y}" width="1920" height="${10 + (i % 3) * 8}" fill="#fff" opacity="${0.12 * tape}"/>`; } }
+    return { cam: { x: 960, y: 560, z: 1.0 }, actors: a, over };
+  });
+  Anim.drive(tl, DUR, update);
+  tl.fromTo("#rw-tag", { opacity: 0, x: 160, filter: "blur(14px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, 0.1);
+  tl.to("#rw-tag", { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, tEnd + 0.3);
+</script>

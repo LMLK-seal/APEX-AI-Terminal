@@ -1,0 +1,2 @@
+{"command":"comp.new","params":{"name":"Titolo","width":1920,"height":1080,"frameRate":30,"duration":3,"background":"#F4EBD9"}}
+{"command":"layer.newText","params":{"text":"Nodomatic","position":[960,540],"size":140,"fill":"#2A3A55"}}

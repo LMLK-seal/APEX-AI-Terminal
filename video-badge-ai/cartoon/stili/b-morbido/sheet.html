@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Stile B — Morbido premium</title>
+<style>
+@font-face{font-family:Inter;font-weight:600;src:url(../../fonts/inter-latin-600-normal.woff2)}
+@font-face{font-family:Inter;font-weight:800;src:url(../../fonts/inter-latin-800-normal.woff2)}
+@font-face{font-family:"EB Garamond";font-weight:700;src:url(../../fonts/eb-garamond-latin-700-normal.woff2)}
+@font-face{font-family:"IBM Plex Mono";font-weight:700;src:url(../../fonts/ibm-plex-mono-latin-700-normal.woff2)}
+html,body{margin:0;background:#2a1f2e}
+svg{display:block}
+text{font-family:Inter,sans-serif}
+.h{font-family:"EB Garamond",serif;font-weight:700}
+.m{font-family:"IBM Plex Mono",monospace;font-weight:700}
+.tag{font-weight:800;letter-spacing:.14em;font-size:15px;fill:#8a5a3a}
+.cap{font-weight:800;letter-spacing:.1em;font-size:13px;fill:#6b4a3a;text-anchor:middle}
+.note{font-weight:600;font-size:16px;fill:#4a3a42}
+</style></head>
+<body>
+<svg id="sheet" xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+<script src="../../loghi.js"></script>
+<script src="stile.js"></script>
+<script>
+const S = StileB, P = S.palette;
+const svg = document.getElementById("sheet");
+let out = "";
+const at = (x, y, s, inner) => `<g transform="translate(${x},${y}) scale(${s})">${inner}</g>`;
+const panel = (x, y, w, h, label) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" fill="#fff" opacity=".42"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/><text x="${x + 26}" y="${y + 36}" class="tag">${label}</text>`;
+const floor = (x, y, w) => `<ellipse cx="${x}" cy="${y}" rx="${w}" ry="14" fill="#c9a77c" opacity=".35"/>`;
+
+out += `<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7ecd8"/><stop offset=".6" stop-color="#efdcc0"/><stop offset="1" stop-color="#e3c9a6"/></linearGradient>
+<radialGradient id="vg" cx=".5" cy=".4" r=".8"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#4a2a1a" stop-opacity=".22"/></radialGradient></defs>
+<rect width="1920" height="1080" fill="url(#bg)"/><rect width="1920" height="1080" fill="url(#vg)"/>`;
+out += `<text x="60" y="92" class="h" font-size="68" fill="#3a2430">Stile B — Morbido premium</text>
+<text x="64" y="124" class="m" font-size="17" fill="#9a6a4a" letter-spacing=".08em">NODOMATIC · «SONO UN BADGE» · VETTORIALE MORBIDO 2.5D · MODEL SHEET</text>`;
+
+// ---- BADGE: tre pose
+out += panel(40, 150, 960, 440, "IL BADGE · NEUTRO · ORGOGLIOSO · PREOCCUPATO");
+const bs = 0.8, by = 560;
+const poses = [
+  { x: 190, o: { mouth: "rest", strap: 62, led: null, eyes: { open: 1, px: 0.1, py: 0 }, brow: { curve: 7 } }, cap: "NEUTRO" },
+  { x: 510, o: { mouth: "smile", led: "ok", armL: [-182, -196, 0.28, "thumb"], armR: [172, -330, -0.2, "point"], eyes: { open: 1.05, px: 0.2, py: -0.15 }, brow: { y: -276, curve: 11, tilt: -3 }, squash: 1.03 }, cap: "ORGOGLIOSO / INDICA" },
+  { x: 830, o: { mouth: "worried", led: "no", sweat: true, armL: [-70, -170, 0.5, "open"], armR: [74, -150, -0.5, "open"], lf: true, rf: true, eyes: { open: 1.18, px: -0.25, py: -0.2 }, brow: { y: -272, worry: 1, curve: 4 }, squash: 0.96 }, cap: "PREOCCUPATO" },
+];
+poses.forEach((p) => { out += floor(p.x, by, 120) + at(p.x, by, bs, S.badge(p.o)) + `<text x="${p.x}" y="${by + 26}" class="cap">${p.cap}</text>`; });
+
+// ---- Riga bocche (crop sul volto)
+const mouths = [["rest", "RIPOSO"], ["A", "A"], ["O", "O"], ["smile", "SORRISO"], ["worried", "PREOCCUPATO"], ["shout", "GRIDO"]];
+out += panel(40, 610, 960, 196, "VISEMI · BOCCHE");
+mouths.forEach(([k, n], i) => {
+  const x = 62 + i * 156, w = 144, h = 112;
+  const face = { rest: { eyes: { open: 1 } }, A: {}, O: { eyes: { open: 1.15 } }, smile: { eyes: { open: 1, px: .15 } }, worried: { brow: { worry: 1, y: -272 }, eyes: { open: 1.15 } }, shout: { brow: { y: -282, curve: 12, worry: -.5 }, eyes: { open: 1.2 } } }[k];
+  out += `<rect x="${x}" y="654" width="${w}" height="${h}" rx="18" fill="#fff6e8"/><svg x="${x}" y="654" width="${w}" height="${h}" viewBox="-104 -296 208 150" overflow="hidden" preserveAspectRatio="xMidYMid slice">${S.badge({ mouth: k, ...face, brow: face.brow ?? { curve: 7 } })}</svg>
+    <rect x="${x}" y="654" width="${w}" height="${h}" rx="18" fill="none" stroke="#e3c9a6" stroke-width="2"/><text x="${x + w / 2}" y="788" class="cap" font-size="12">${n}</text>`;
+});
+
+// ---- MOUSE + GENI
+out += panel(1020, 150, 860, 330, "IL MOUSE · STRUMENTI APPROVATI (teal)");
+const gy = 455, gs = 0.68;
+out += floor(1150, gy, 90) + at(1150, gy, 0.8, S.mouse({ mouth: "worried", sweat: true, cup: true, eyes: { open: 1.12, px: 0.25, py: -0.1 }, brow: { worry: 0.8, y: -196 } })) + `<text x="1150" y="${gy + 26}" class="cap">IL MOUSE</text>`;
+out += at(1450, gy, gs + .04, S.genie("copilot", { approved: true, float: 12, armL: [-128, -200, .35, "open"], armR: [118, -250, -.3, "open"] })) + `<text x="1450" y="${gy + 26}" class="cap">COPILOT · AZIENDALE</text>`;
+out += at(1690, gy, gs + .04, S.genie("claude", { approved: true, float: 12, mouth: "grin", armR: [150, -262, -.3, "thumb"] })) + `<text x="1690" y="${gy + 26}" class="cap">CLAUDE · CON LICENZA</text>`;
+
+out += panel(1020, 500, 860, 330, "STRUMENTI NON AUTORIZZATI (giallo + GRATIS)");
+const uy = 800;
+out += at(1190, uy, gs + .04, S.genie("chatgpt", { approved: false, float: 12, armL: [-130, -250, .3, "point"] })) + `<text x="1190" y="${uy + 26}" class="cap">CHATGPT · GRATIS</text>`;
+out += at(1410, uy, gs + .04, S.genie("perplexity", { approved: false, float: 12, mouth: "grin", armR: [136, -180, -.3, "open"] })) + `<text x="1410" y="${uy + 26}" class="cap">PERPLEXITY · GRATIS</text>`;
+// piccola fetta di ufficio a strati
+out += `<clipPath id="oc"><rect x="1530" y="560" width="320" height="180" rx="14"/></clipPath><g clip-path="url(#oc)"><g transform="translate(1530,560) scale(.1667)">${S.office({})}</g></g><rect x="1530" y="560" width="320" height="180" rx="14" fill="none" stroke="#fff" stroke-width="3"/>
+<text x="1690" y="764" class="cap">UFFICIO · 3 STRATI</text><text x="1690" y="784" class="cap" font-size="11" fill="#9a6a4a">lontano 0 · medio .5 · davanti 1</text>`;
+
+// ---- Palette e principi
+out += panel(40, 826, 1840, 220, "PRINCIPI");
+const sw = [[P.kraft, "caldo = al sicuro, in azienda"], [P.copper, "rame: badge, tazze, fiocchi"], [P.navyMid, "blu notte = fuori controllo"], [P.gratis, "giallo + rosa = «gratis», rischio"], [P.teal, "verde acqua = scelta giusta"], [P.mouse, "acciaio = il collega mouse"]];
+sw.forEach(([c, t], i) => { const x = 66 + (i % 3) * 300, y = 878 + Math.floor(i / 3) * 62;
+  out += `<circle cx="${x + 20}" cy="${y + 8}" r="20" fill="${c}" stroke="#fff" stroke-width="3"/><circle cx="${x + 13}" cy="${y}" r="6" fill="#fff" opacity=".6"/><text x="${x + 52}" y="${y + 14}" class="note" font-size="15">${t}</text>`; });
+const notes = ["Volumi soffici: 2-3 toni di gradiente per materiale + luce di bordo a basso-destra", "Contorno colorato (tinta scura del riempimento), spesso dal lato in ombra", "Occhi grandi con due riflessi; plastica lucida (badge, guscio mouse) con riflessi a finestra", "Ogni parte ha data-depth: body .5 · braccia .46/.54 · viso .55-.58 · gambe .44 per il parallasse"];
+notes.forEach((t, i) => { out += `<circle cx="990" cy="${892 + i * 34}" r="4.5" fill="${P.copper}"/><text x="1006" y="${898 + i * 34}" class="note">${t}</text>`; });
+svg.innerHTML = out;
+</script></body></html>

@@ -1,0 +1,28 @@
+  <div id="nm-row" style="position:absolute; left:0; right:0; top:120px; text-align:center; white-space:nowrap">
+    <span id="nm-0" class="tag ttl" style="position:relative; display:inline-block; margin:0 6px; padding:6px 24px 0; font-size:176px; line-height:1.05; transform:rotate(-6deg)">S</span><span id="nm-1" class="tag ttl" style="position:relative; display:inline-block; margin:0 6px; padding:6px 24px 0; font-size:176px; line-height:1.05; transform:rotate(4deg)">H</span><span id="nm-2" class="tag ttl" style="position:relative; display:inline-block; margin:0 6px; padding:6px 24px 0; font-size:176px; line-height:1.05; transform:rotate(-3deg)">A</span><span id="nm-3" class="tag ttl" style="position:relative; display:inline-block; margin:0 6px; padding:6px 24px 0; font-size:176px; line-height:1.05; transform:rotate(7deg)">D</span><span id="nm-4" class="tag ttl" style="position:relative; display:inline-block; margin:0 6px; padding:6px 24px 0; font-size:176px; line-height:1.05; transform:rotate(-5deg)">O</span><span id="nm-5" class="tag ttl" style="position:relative; display:inline-block; margin:0 6px; padding:6px 24px 0; font-size:176px; line-height:1.05; transform:rotate(3deg)">W</span><span style="display:inline-block; width:56px"></span><span id="nm-6" class="tag ttl cu" style="position:relative; display:inline-block; margin:0 6px; padding:6px 24px 0; font-size:176px; line-height:1.05; transform:rotate(-4deg)">A</span><span id="nm-7" class="tag ttl cu" style="position:relative; display:inline-block; margin:0 6px; padding:6px 24px 0; font-size:176px; line-height:1.05; transform:rotate(6deg)">I</span>
+  </div>
+<script>
+  // Scena 5 - "Questa si chiama Shadow AI." I server si sporgono e sogghignano, il contratto deglutisce,
+  // le lettere di carta cadono una alla volta (ogni colpo fa tremare un po' la camera).
+  const tS = W(0, "Shadow"), step = 0.075;
+  const hits = Array.from({ length: 8 }, (_, i) => tS + i * step + 0.2);
+  const KC = [
+    [0, { x: 960, y: 890, s: 0.95, open: 1.08, bc: 22, by: -302, px: 0.1, py: -0.1, lx: -90, ly: -140, rx: 90, ry: -140, idleMouth: "worried", sweat: true }],
+    [tS - 0.1, { px: 0, py: -1, open: 1.2, by: -314 }, "power2.out"],                                // alza lo sguardo verso il titolo
+    [hits[7] + 0.2, { sq: 0.92 }, "power2.in"], [hits[7] + 0.45, { sq: 1.0, py: 0.2, px: 0 }, "power2.out"],   // deglutisce
+  ];
+  const CAM = [[0, { x: 960, y: 640, z: 1.16 }], [DUR, { x: 960, y: 600, z: 1.24 }, "power1.inOut"]];
+  const update = Anim.stage($("svg.stage"), Scenes.serverRoom({ fx: false, servers: false }), Scenes.fx("night"), (t) => {
+    const c = Anim.at(KC, t); c.mouth = MOUTH(t, c.idleMouth); c.blink = Anim.blinkAt([0.6], t);
+    const lean = Anim.ease("power2.inOut")(Anim.clamp((t - 0.1) / 1.2)) * 7;
+    const cam = Anim.at(CAM, t); for (const h of hits) { cam.x += Anim.shake(t, h, 5, 0.18); cam.y += Anim.shake(t, h, 4, 0.18); }
+    let a = Scenes.racks(Array(12).fill(1), lean);
+    a += Anim.shadow({ x: 960, y: 890, s: c.s, ground: 890 }, 120, "#000", 0.45);
+    a += `<g filter="url(#fxCopy)">${Anim.place(Anim.contratto(c, t), c)}</g>`;
+    const flick = 0.85 + 0.15 * Math.sin(t * 37) * Math.sin(t * 13);
+    return { cam, actors: a, over: `<rect width="1920" height="1080" fill="#000" opacity="${(1 - flick) * 0.6}"/>` };
+  });
+  Anim.drive(tl, DUR, update);
+  hits.forEach((h, i) => tl.fromTo("#nm-" + i, { opacity: 0, y: -160, scale: 1.35 }, { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: "power4.in" }, h - 0.2));
+  tl.to("#nm-row", { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, DUR - 0.25);
+</script>

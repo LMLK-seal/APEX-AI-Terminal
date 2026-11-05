@@ -1,0 +1,103 @@
+<template>
+<style>
+  #fretta { position:absolute; inset:0; overflow:hidden; }
+  #fretta svg.stage { position:absolute; left:0; top:0; }
+
+  .tag { position:absolute; background:#f1ebde url(assets/paper.png); background-blend-mode:multiply; color:#1c2230;
+         box-shadow: 0 3px 0 rgba(60,40,20,.25), 0 14px 30px rgba(0,0,0,.28); border-radius:4px; }
+  .tag.cu { background-color:#b5562a; color:#fbf4ea; } .tag.navy { background-color:#16233a; color:#f1ebde; }
+  .lbl { font-family:'Inter'; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+  .ttl { font-family:'EB Garamond'; font-weight:700; }
+  .mono { font-family:'IBM Plex Mono'; font-weight:700; }
+
+</style>
+<div id="fretta" data-composition-id="fretta" data-width="1920" data-height="1080">
+  <svg class="stage" width="1920" height="1080" viewBox="0 0 1920 1080" data-layout-ignore></svg>
+
+</div>
+<script>
+(function () {
+  const SID = "fretta", DUR = 12.094, S0 = 9.299;
+  const LINES = [{"scene": "buongiorno", "start": 2.0, "end": 8.699, "caption": "Buongiorno! Sono un contratto. Tre pagine, due firme… e parecchi dati riservati.", "pauses": [[0.0, 4.4], [4.736, 6.699]], "speech": 6.699, "words": [{"w": "Buongiorno!", "start": 1.88, "end": 2.8}, {"w": "Sono", "start": 2.9, "end": 3.16}, {"w": "un", "start": 3.16, "end": 3.32}, {"w": "contratto.", "start": 3.32, "end": 4.12}, {"w": "Tre", "start": 4.4, "end": 4.62}, {"w": "pagine,", "start": 4.62, "end": 5.18}, {"w": "due", "start": 5.42, "end": 5.6}, {"w": "firme…", "start": 5.6, "end": 6.56}, {"w": "e", "start": 6.56, "end": 6.86}, {"w": "parecchi", "start": 6.86, "end": 7.5}, {"w": "dati", "start": 7.5, "end": 7.84}, {"w": "riservati.", "start": 7.84, "end": 8.56}]}, {"scene": "fretta", "start": 9.799, "end": 12.359, "caption": "Ore nove e quindici. Qualcuno ha fretta.", "pauses": [[0.0, 2.56]], "speech": 2.56, "words": [{"w": "Ore", "start": 9.615, "end": 9.995}, {"w": "nove", "start": 9.995, "end": 10.175}, {"w": "e", "start": 10.175, "end": 10.835}, {"w": "quindici.", "start": 10.175, "end": 10.835}, {"w": "Qualcuno", "start": 11.295, "end": 11.715}, {"w": "ha", "start": 11.715, "end": 11.835}, {"w": "fretta.", "start": 11.835, "end": 12.295}]}, {"scene": "fretta", "start": 13.409, "end": 17.487, "caption": "Mi copia… e mi incolla in un chatbot trovato online.", "pauses": [[0.0, 1.04], [1.472, 4.078]], "speech": 4.078, "words": [{"w": "Mi", "start": 13.385, "end": 13.625}, {"w": "copia…", "start": 13.625, "end": 14.285}, {"w": "e", "start": 14.285, "end": 14.985}, {"w": "mi", "start": 14.985, "end": 15.145}, {"w": "incolla", "start": 15.145, "end": 15.585}, {"w": "in", "start": 15.585, "end": 15.665}, {"w": "un", "start": 15.665, "end": 15.785}, {"w": "chatbot", "start": 15.785, "end": 16.345}, {"w": "trovato", "start": 16.345, "end": 16.845}, {"w": "online.", "start": 16.845, "end": 17.265}]}, {"scene": "fretta", "start": 18.837, "end": 20.693, "caption": "Gratis. Che fortuna.", "pauses": [[0.0, 1.856]], "speech": 1.856, "words": [{"w": "Gratis.", "start": 18.837, "end": 19.417}, {"w": "Che", "start": 19.417, "end": 19.597}, {"w": "fortuna.", "start": 19.597, "end": 20.217}]}, {"scene": "nessuno", "start": 21.893, "end": 29.283, "caption": "Nessuno l'ha vietato. Nessuno l'ha autorizzato. Diciamo che… nessuno ha chiesto.", "pauses": [[0.0, 2.992], [4.96, 7.39]], "speech": 7.39, "words": [{"w": "Nessuno", "start": 21.837, "end": 22.257}, {"w": "l'ha", "start": 22.257, "end": 22.377}, {"w": "vietato.", "start": 22.417, "end": 22.857}, {"w": "Nessuno", "start": 23.317, "end": 23.717}, {"w": "l'ha", "start": 23.717, "end": 23.897}, {"w": "autorizzato.", "start": 23.957, "end": 24.717}, {"w": "Diciamo", "start": 26.437, "end": 27.277}, {"w": "che…", "start": 27.277, "end": 27.537}, {"w": "nessuno", "start": 27.537, "end": 28.557}, {"w": "ha", "start": 28.557, "end": 28.717}, {"w": "chiesto.", "start": 28.717, "end": 29.257}]}, {"scene": "viaggio", "start": 30.983, "end": 32.64, "caption": "Trenta secondi, ed è fatto.", "pauses": [[0.0, 1.657]], "speech": 1.657, "words": [{"w": "Trenta", "start": 30.863, "end": 31.143}, {"w": "secondi,", "start": 31.143, "end": 31.863}, {"w": "ed", "start": 31.863, "end": 32.063}, {"w": "è", "start": 32.063, "end": 32.183}, {"w": "fatto.", "start": 32.183, "end": 32.363}]}, {"scene": "viaggio", "start": 34.49, "end": 38.615, "caption": "Peccato che adesso io sia qui. Non so nemmeno in che paese.", "pauses": [[0.0, 2.064], [2.4, 4.125]], "speech": 4.125, "words": [{"w": "Peccato", "start": 34.434, "end": 35.054}, {"w": "che", "start": 35.054, "end": 35.194}, {"w": "adesso", "start": 35.194, "end": 35.514}, {"w": "io", "start": 35.514, "end": 35.774}, {"w": "sia", "start": 35.774, "end": 35.974}, {"w": "qui.", "start": 35.974, "end": 36.294}, {"w": "Non", "start": 36.874, "end": 37.114}, {"w": "so", "start": 37.114, "end": 37.334}, {"w": "nemmeno", "start": 37.334, "end": 37.734}, {"w": "in", "start": 37.734, "end": 37.814}, {"w": "che", "start": 37.814, "end": 37.934}, {"w": "paese.", "start": 37.934, "end": 38.434}]}, {"scene": "nome", "start": 39.415, "end": 41.778, "caption": "Questa si chiama Shadow AI.", "pauses": [[0.0, 2.363]], "speech": 2.363, "words": [{"w": "Questa", "start": 39.295, "end": 39.815}, {"w": "si", "start": 39.815, "end": 40.155}, {"w": "chiama", "start": 40.155, "end": 40.415}, {"w": "Shadow", "start": 40.415, "end": 40.995}, {"w": "AI.", "start": 40.995, "end": 41.435}]}, {"scene": "rischio", "start": 43.878, "end": 58.147, "caption": "E il rischio è doppio. Per l'azienda: dati dei clienti esposti, informazioni riservate fuori controllo. Per te: errori che firmi tu, e regole aziendali violate.", "pauses": [[0.0, 2.192], [2.656, 8.432], [9.216, 9.84], [10.016, 14.269]], "speech": 14.269, "words": [{"w": "E", "start": 43.726, "end": 44.046}, {"w": "il", "start": 44.046, "end": 44.266}, {"w": "rischio", "start": 44.266, "end": 44.786}, {"w": "è", "start": 44.786, "end": 45.266}, {"w": "doppio.", "start": 45.266, "end": 45.946}, {"w": "Per", "start": 46.566, "end": 46.666}, {"w": "l'azienda:", "start": 46.666, "end": 46.846}, {"w": "dati", "start": 47.846, "end": 48.186}, {"w": "dei", "start": 48.186, "end": 48.306}, {"w": "clienti", "start": 48.306, "end": 48.766}, {"w": "esposti,", "start": 48.766, "end": 49.466}, {"w": "informazioni", "start": 49.786, "end": 50.406}, {"w": "riservate", "start": 50.406, "end": 51.106}, {"w": "fuori", "start": 51.286, "end": 51.506}, {"w": "controllo.", "start": 51.506, "end": 52.166}, {"w": "Per", "start": 53.126, "end": 53.286}, {"w": "te:", "start": 53.286, "end": 53.546}, {"w": "errori", "start": 54.226, "end": 54.686}, {"w": "che", "start": 54.686, "end": 54.786}, {"w": "firmi", "start": 54.786, "end": 55.246}, {"w": "tu,", "start": 55.246, "end": 55.466}, {"w": "e", "start": 55.466, "end": 55.986}, {"w": "regole", "start": 55.986, "end": 56.406}, {"w": "aziendali", "start": 56.406, "end": 57.166}, {"w": "violate.", "start": 57.166, "end": 57.986}]}, {"scene": "rischio", "start": 59.097, "end": 60.681, "caption": "Firmate da te, eh.", "pauses": [[0.0, 1.584]], "speech": 1.584, "words": [{"w": "Firmate", "start": 58.913, "end": 59.613}, {"w": "da", "start": 59.613, "end": 59.833}, {"w": "te,", "start": 59.833, "end": 60.193}, {"w": "eh.", "start": 60.293, "end": 60.533}]}, {"scene": "riavvolgi", "start": 62.381, "end": 63.606, "caption": "Riavvolgiamo.", "pauses": [[0.0, 1.225]], "speech": 1.225, "words": [{"w": "Riavvolgiamo.", "start": 62.325, "end": 63.265}]}, {"scene": "giusta", "start": 65.906, "end": 72.794, "caption": "Stessa azienda, tre cose in più. Uno strumento approvato. Regole chiare. Persone formate.", "pauses": [[0.0, 2.352], [2.656, 4.144], [4.352, 5.456], [5.568, 6.888]], "speech": 6.888, "words": [{"w": "Stessa", "start": 65.818, "end": 66.338}, {"w": "azienda,", "start": 66.338, "end": 66.958}, {"w": "tre", "start": 66.958, "end": 67.358}, {"w": "cose", "start": 67.358, "end": 67.698}, {"w": "in", "start": 67.698, "end": 67.858}, {"w": "più.", "start": 67.858, "end": 68.098}, {"w": "Uno", "start": 68.098, "end": 68.738}, {"w": "strumento", "start": 68.738, "end": 69.278}, {"w": "approvato.", "start": 69.278, "end": 69.918}, {"w": "Regole", "start": 69.918, "end": 70.698}, {"w": "chiare.", "start": 70.698, "end": 71.198}, {"w": "Persone", "start": 71.198, "end": 71.878}, {"w": "formate.", "start": 71.878, "end": 72.598}]}, {"scene": "finale", "start": 73.994, "end": 78.397, "caption": "Il lavoro si fa lo stesso, in trenta secondi. E io… resto a casa.", "pauses": [[0.0, 2.48], [2.688, 3.216], [3.456, 4.403]], "speech": 4.403, "words": [{"w": "Il", "start": 73.746, "end": 73.986}, {"w": "lavoro", "start": 73.986, "end": 74.206}, {"w": "si", "start": 74.206, "end": 74.406}, {"w": "fa", "start": 74.406, "end": 74.566}, {"w": "lo", "start": 74.566, "end": 74.686}, {"w": "stesso,", "start": 74.686, "end": 75.046}, {"w": "in", "start": 75.046, "end": 75.426}, {"w": "trenta", "start": 75.426, "end": 75.766}, {"w": "secondi.", "start": 75.766, "end": 76.566}, {"w": "E", "start": 76.566, "end": 76.826}, {"w": "io…", "start": 76.826, "end": 77.086}, {"w": "resto", "start": 77.086, "end": 77.706}, {"w": "a", "start": 77.706, "end": 77.926}, {"w": "casa.", "start": 77.926, "end": 78.126}]}];
+  const L = LINES.filter((l) => l.scene === SID).map((l) => ({ ...l, a: l.start - S0, b: l.end - S0 }));
+  const W = (i, word, edge = "start") => Anim.wordTime(L[i], word, edge) - S0;      // istante locale di una parola
+  const MOUTH = (t, idle = "rest") => Anim.mouthAt(LINES, S0 + t, idle);           // lip-sync del Contratto
+  const $ = (s) => document.querySelector("#fretta " + s);
+  const tl = gsap.timeline({ paused: true });
+
+// Scena 2 - La fretta. Inserto sull'orologio ("Ore nove e quindici"), il Mouse arriva di corsa con il caffe' e frena
+  // derapando; "Mi copia...": lampo, una copia del Contratto salta fuori e il Mouse la trascina nello schermo;
+  // ChatGratis spunta dal portatile a braccia aperte; "Gratis. Che fortuna.": primo piano impassibile.
+  const tQ = W(0, "Qualcuno"), tF = W(0, "fretta"), tCopia = W(1, "copia"), tInc = W(1, "incolla"), tChat = W(1, "chatbot"), tGr = L[2].a;
+  const SCR = { x: 465, y: 602 };                                      // centro dello schermo del portatile
+  const CAM = [
+    [0, { x: 1470, y: 236, z: 2.3 }], [tQ - 0.06, { x: 1466, y: 238, z: 2.36 }, "none"],     // inserto: l'orologio
+    [tQ - 0.05, { x: 960, y: 560, z: 1.0 }, "none"],                                        // stacco sul campo largo
+    [tCopia, { x: 900, y: 560, z: 1.04 }, "power2.inOut"], [tChat + 0.4, { x: 760, y: 560, z: 1.08 }, "power2.inOut"],
+    [tGr - 0.11, { x: 760, y: 560, z: 1.08 }, "none"], [tGr - 0.1, { x: 1010, y: 640, z: 1.45 }, "none"],   // stacco: primo piano
+    [DUR, { x: 1004, y: 646, z: 1.5 }, "power1.inOut"],
+  ];
+  const KC = [   // il Contratto
+    [0, { x: 1000, y: 864, s: 1.22, by: -300, bc: 8, px: 0, py: 0, lid: 0.2, lx: -150, ly: -120, rx: 150, ry: -120, turn: 0, idleMouth: "rest" }],
+    [tQ + 0.2, { px: 1, py: -0.1, by: -308, bc: 14, lid: 0, turn: 0.2 }, "power2.out"],        // "Qualcuno ha fretta": guarda il Mouse
+    [tF + 0.4, { sq: 0.97 }], [tF + 0.55, { sq: 1.0 }],
+    [tCopia - 0.02, { sq: 1 }], [tCopia + 0.06, { sq: 0.86, by: -316, bc: 18, lx: -170, ly: -210, rx: 170, ry: -210 }, "power4.out"],   // il "clic" della copia
+    [tCopia + 0.3, { sq: 1.04 }, "back.out(2)"], [tCopia + 0.45, { sq: 1 }],
+    [tInc - 0.3, { px: -1, py: 0.2, turn: -0.3, bc: 22, by: -300, lx: -90, ly: -150, rx: 90, ry: -150 }, "power2.inOut"],   // segue la copia, preoccupato
+    [tChat, { px: -1, py: 0.3 }],
+    [tGr - 0.1, { px: 0, py: 0, turn: 0, lid: 0.52, bc: 0, bt: -2, by: -292, lx: -140, ly: -100, rx: 140, ry: -100, idleMouth: "flat" }, "none"],  // impassibile
+    [DUR, { lid: 0.55 }],
+  ];
+  const KM = [   // il Mouse frettoloso
+    [0, { x: 2250, y: 868, s: 0.95, r: -12, run: 1, px: -0.8, mouth: "grin", ct: 24 }],
+    [tQ, { x: 2250 }], [tF + 0.28, { x: 1440, r: 8, run: 0, ct: -14 }, "power2.out"],         // arriva e frena
+    [tF + 0.5, { r: -3, ct: 10 }, "back.out(2)"], [tF + 0.7, { r: 0, ct: 6 }],
+    [tCopia - 0.35, { lx: -130, ly: -150 }], [tCopia - 0.05, { lx: -330, ly: -200, lb: 0.2 }, "power3.out"],   // allunga la mano
+    [tCopia + 0.25, { lx: -250, ly: -260, lh: "point" }, "power2.out"],
+    [tInc + 0.2, { lx: -380, ly: -150, px: -1 }, "power2.inOut"],                                         // trascina verso lo schermo
+    [tChat + 0.3, { lx: -140, ly: -150, lh: "open", mouth: "smile", px: -0.6 }, "power2.out"],
+  ];
+  const KK = [   // la copia
+    [0, { o: 0, x: 1000, y: 864, s: 0.3, r: 0 }],
+    [tCopia, { o: 0 }], [tCopia + 0.02, { o: 1, x: 1000, y: 864, s: 0.5 }, "none"],
+    [tCopia + 0.32, { x: 1170, y: 760, s: 0.9, r: 8 }, "back.out(1.6)"],
+    [tInc - 0.15, { x: 1060, y: 620, s: 0.85, r: -10 }, "sine.inOut"],
+    [tInc + 0.25, { x: SCR.x, y: SCR.y + 40, s: 0.12, r: -340 }, "power3.in"], [tInc + 0.27, { o: 0 }, "none"],
+  ];
+  // ChatGratis: esce dallo schermo (lo schermo si gonfia, sale da dentro il display, salta) e si appollaia sul portatile
+  const PERCH = { x: 465, y: 650, s: 0.95 }, tOut = tChat - 0.3;
+  const KG = [
+    [0, { lx: -150, ly: -120, rx: 150, ry: -120, mouth: "O", lid: 0, px: 0, open: 1.2 }],
+    [tOut + 0.55, { lx: -215, ly: -268, rx: 212, ry: -268, mouth: "grin", lid: 0.42, px: 0.6, open: 1 }, "back.out(2)"],   // "Benvenuto!" a braccia aperte
+    [tGr + 0.9, { rx: 222, ry: -250, rh: "thumb", px: 1 }, "back.out(2)"],                                                 // "Che fortuna": pollice su
+  ];
+  const gratis = (t) => Anim.chatgratis(Anim.at(KG, t), t);
+  const flashes = [tCopia, tInc + 0.26];
+  const blinks = [tF + 1.0, tChat + 0.8];
+  const update = Anim.stage($("svg.stage"), Scenes.office({ fx: false }), Scenes.fx("warm"), (t) => {
+    const c = Anim.at(KC, t); c.blink = Anim.blinkAt(blinks, t); c.mouth = MOUTH(t, c.idleMouth);
+    const m = Anim.at(KM, t), k = Anim.at(KK, t);
+    if (m.run > 0.05) { m.stride = t * 22; m.y -= Math.abs(Math.sin(t * 11)) * 20 * m.run; }
+    let a = `<g transform="translate(1470,230)">${Props.secondHand(t + 13)}</g><g transform="translate(1600,642)">${Props.steam(t)}</g>`;
+    // schermo che "inghiotte" la copia
+    const fl = flashes.reduce((v, f) => Math.max(v, Math.max(0, 1 - Math.abs(t - f) / 0.12)), 0);
+    if (fl > 0) a += `<rect x="264" y="488" width="402" height="228" rx="6" fill="#fff" opacity="${fl * 0.9}"/>`;
+    a += Anim.genieOut(t, { t0: tOut, T: 1.0, style: "burst", color: "#ffd23f", perch: PERCH, render: gratis });
+    if (t > tOut + 1.0) a += [[-210, -470], [220, -500], [250, -300], [-240, -300]].map(([sx, sy], i) => { const u = Anim.clamp((t - tOut - 1.0 - i * 0.1) / 0.3);
+      return `<g transform="translate(${PERCH.x + sx * PERCH.s},${PERCH.y + sy * PERCH.s}) rotate(${t * 90 + i * 40}) scale(${PERCH.s * u * (0.8 + 0.2 * Math.sin(t * 6 + i))})">${Props.sparkle(16, i % 2 ? "#fff" : Chars.P.gratisPink)}</g>`; }).join("");
+    a += Anim.shadow({ ...c, ground: 864 }, 135);
+    a += Anim.place(Anim.contratto(c, t), c);
+    if (m.x < 2150) {
+      a += Anim.shadow({ ...m, ground: 868 }, 110);
+      if (m.run > 0.05) a += `<g transform="translate(${m.x + 150},${m.y - 40})">${Props.speedLines(3, 140 * m.run, 0.6)}</g>`;
+      a += Anim.place(Anim.mouse(m, t), m);
+    }
+    if (k.o > 0) a += `<g filter="url(#fxCopy)">${Anim.place(Anim.contratto({ px: -0.6, py: -0.2, open: 1.15, by: -312, bc: 16, mouth: "O", lx: -160, ly: -230, rx: 160, ry: -230, idle: 0 }, t), k)}</g>`;
+    if (fl > 0 && t < tCopia + 0.2) a += `<circle cx="1000" cy="640" r="${220 * (1 - fl) + 40}" fill="none" stroke="#fff" stroke-width="${10 * fl}" opacity="${fl}"/>`;
+    return { cam: Anim.at(CAM, t), actors: a };
+  });
+  Anim.drive(tl, DUR, update);
+  window.__timelines[SID] = tl;
+})();
+</script>
+</template>

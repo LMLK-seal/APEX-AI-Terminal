@@ -1,0 +1,92 @@
+{
+ "voice_id": "Iva39E3GwRoV8qBIVcgR",
+ "voice_name": "Contratto - Sono un contratto (Voice Design, donna 3)",
+ "model": "eleven_v3",
+ "voice_settings": {
+  "stability": 0.5,
+  "similarity_boost": 0.75,
+  "style": 0.3,
+  "use_speaker_boost": true
+ },
+ "lines": {
+  "00": {
+   "text": "[orgoglioso] Buongiorno! Sono un contratto. Tre pagine, due firme... [abbassando la voce] e parecchi dati riservati.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:33"
+  },
+  "01": {
+   "text": "[allarmato] Ore nove e quindici. Qualcuno ha fretta.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:33"
+  },
+  "02": {
+   "text": "[incredulo] Mi copia... e mi incolla in un chatbot trovato online.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:33"
+  },
+  "03": {
+   "text": "[sarcastico] Gratis. Che fortuna.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:33"
+  },
+  "04": {
+   "text": "Nessuno l'ha vietato. Nessuno l'ha autorizzato. [pausa] Diciamo che... nessuno ha chiesto.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:33"
+  },
+  "05": {
+   "text": "[veloce] Trenta secondi, ed è fatto.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:33"
+  },
+  "06": {
+   "text": "[spaesato] Peccato che adesso io sia qui. Non so nemmeno in che paese.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:33"
+  },
+  "07": {
+   "text": "[chiaro, scandito] Questa si chiama Shadow AI.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:33"
+  },
+  "08": {
+   "text": "[serio] E il rischio è doppio. Per l'azienda: dati dei clienti esposti, informazioni riservate fuori controllo. Per te: errori che firmi tu, e regole aziendali violate.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:34"
+  },
+  "09": {
+   "text": "[sottovoce, ammiccante] Firmate da te, eh.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:34"
+  },
+  "10": {
+   "text": "[deciso] Riavvolgiamo.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:34"
+  },
+  "11": {
+   "text": "[sollevato] Stessa azienda, tre cose in più. Uno strumento approvato. Regole chiare. Persone formate.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:34"
+  },
+  "12": {
+   "text": "[soddisfatto] Il lavoro si fa lo stesso, in trenta secondi. [sorridendo] E io... resto a casa.",
+   "output_format": "mp3_44100_128",
+   "previous_next_text": false,
+   "generated": "2026-11-03 23:34"
+  }
+ },
+ "atempo": 1.0
+}

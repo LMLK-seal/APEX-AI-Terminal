@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Immagine chiave</title>
+<style>
+  @font-face { font-family: "EB Garamond"; font-weight: 700; src: url(fonts/eb-garamond-latin-700-normal.woff2); }
+  @font-face { font-family: "Inter"; font-weight: 600; src: url(fonts/inter-latin-600-normal.woff2); }
+  @font-face { font-family: "Inter"; font-weight: 800; src: url(fonts/inter-latin-800-normal.woff2); }
+  @font-face { font-family: "IBM Plex Mono"; font-weight: 700; src: url(fonts/ibm-plex-mono-latin-700-normal.woff2); }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+</style>
+<script src="characters.js"></script><script src="scenes.js"></script></head>
+<body><svg id="s" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+<script>
+  const f = new URLSearchParams(location.search).get("f") || "buongiorno";
+  document.getElementById("s").innerHTML = Scenes.frames[f]();
+</script></body></html>

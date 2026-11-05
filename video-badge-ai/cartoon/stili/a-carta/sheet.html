@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Stile A — Carta ritagliata</title>
+<style>
+  @font-face { font-family: "Inter"; font-weight: 600; src: url("../../fonts/inter-latin-600-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Inter"; font-weight: 800; src: url("../../fonts/inter-latin-800-normal.woff2") format("woff2"); }
+  @font-face { font-family: "EB Garamond"; font-weight: 700; src: url("../../fonts/eb-garamond-latin-700-normal.woff2") format("woff2"); }
+  @font-face { font-family: "IBM Plex Mono"; font-weight: 700; src: url("../../fonts/ibm-plex-mono-latin-700-normal.woff2") format("woff2"); }
+  html, body { margin: 0; background: #e8dcc4; }
+  svg { display: block; }
+</style></head>
+<body>
+<div id="root"></div>
+<script src="../../loghi.js"></script>
+<script src="stile.js"></script>
+<script>
+(function () {
+  const A = StileA, C = A.C, { piece, rr, ell, lay } = A;
+  const nd = { noDefs: true };
+  const at = (inner, x, y, s = 1) => `<g transform="translate(${x},${y}) scale(${s})">${inner}</g>`;
+  const label = (txt, x, y, w = 0) => { const tw = w || txt.length * 11 + 28; return at(lay(piece(rr(-tw / 2, -15, tw, 30, 6), "#f6eedc", { t: 0.8 }) + `<text y="6" text-anchor="middle" font-family="Inter" font-weight="800" font-size="13" letter-spacing="2" fill="${C.ink}">${txt}</text>`, 1), x, y); };
+  const card = (x, y, w, h, fill, e = 2) => lay(piece(rr(x, y, w, h, 18), fill, { t: 1.5 }), e);
+
+  let s = A.DEFS;
+  s += `<rect width="1920" height="1080" fill="#e4d6b8"/><rect width="1920" height="1080" filter="url(#sA-L0)" fill="#e9dcc3"/>`;
+  s += lay(`<text x="60" y="72" font-family="EB Garamond" font-weight="700" font-size="58" fill="${C.copperDark}">Stile A — Carta ritagliata</text>`, 1);
+  s += `<text x="62" y="100" font-family="Inter" font-weight="600" font-size="17" fill="#6b5236" letter-spacing=".4">Serie «Usare l'IA in sicurezza» · episodio «Sono un badge» · Nodomatic — cartoncino a strati 2.5D, luce da in alto a sinistra</text>`;
+  const sw = [["CASA", C.copper], ["FUORI", C.navy], ["GRATIS", C.gratis], ["APPROVATO", C.teal]];
+  sw.forEach(([t, c], i) => { const x = 1330 + i * 140; s += at(lay(piece(rr(0, 0, 124, 40, 8), c, { t: 1 }) + `<text x="62" y="25" text-anchor="middle" font-family="Inter" font-weight="800" font-size="12" letter-spacing="1.6" fill="${i === 2 ? C.ink : "#fff"}">${t}</text>`, 1), x, 46); });
+
+  const R1y = 124, R1h = 440;
+  const cardsX = [[40, 300], [358, 300], [676, 300], [994, 280]];
+  const cardFill = ["#f1e6cd", "#f1e6cd", "#f1e6cd", "#dbe3ee"];
+  cardsX.forEach(([x, w], i) => { s += card(x, R1y, w, R1h, cardFill[i]); });
+  const bs = 0.88, fy = R1y + 394;
+  s += at(A.badge({ ...nd, id: "bd1", mouth: "smile", led: "ok", strap: 60, brow: { y: -268, curve: 8, tilt: 0 } }), 190, fy, bs);
+  s += at(A.badge({ ...nd, id: "bd2", mouth: "grin", led: "ok", strap: 0, brow: { y: -272, curve: 14, tilt: -7 }, eyes: { open: 1, px: 0.5, py: -0.2, lid: 0.12 }, armL: [-138, -130, 0.55, "open"], armR: [150, -380, -0.2, "point"] }), 508, fy, bs);
+  s += at(A.badge({ ...nd, id: "bd3", mouth: "worried", led: "no", sweat: true, brow: { y: -270, curve: 16, tilt: 8 }, eyes: { open: 1.1, px: -0.45, py: 0.1 }, armL: [-122, -262, 0.5, "open"], armR: [124, -258, -0.5, "open"] }), 826, fy, bs);
+  s += at(A.mouse({ ...nd, id: "ms1" }), 1134, fy - 4, 1.06);
+  s += label("1 · NEUTRO", 190, R1y + 424, 130) + label("2 · ORGOGLIOSO", 508, R1y + 424, 160) + label("3 · PREOCCUPATO", 826, R1y + 424, 170) + label("IL MOUSE", 1134, R1y + 424, 110);
+  s += card(1292, R1y, 588, R1h, "#f1e6cd");
+  s += `<text x="1316" y="${R1y + 38}" font-family="Inter" font-weight="800" font-size="13" letter-spacing="2.4" fill="#8c6a43">VISEMI E ESPRESSIONI</text>`;
+  ["rest", "A", "O", "smile", "worried", "shout"].forEach((m, i) => {
+    const cx = 1316 + (i % 3) * 188, cy = R1y + 58 + Math.floor(i / 3) * 188;
+    s += lay(piece(rr(cx, cy, 172, 150, 16), C.cream, { t: 1.2, dark: "#cdb98f", light: "#fffdf6" }) + at(A.mouthA(m, 2.5), cx + 86, cy + 70) + `<text x="${cx + 86}" y="${cy + 136}" text-anchor="middle" font-family="IBM Plex Mono" font-weight="700" font-size="14" fill="#7a5b38">${m}</text>`, 1);
+  });
+  const R2y = 584, R2h = 480;
+  const gk = [["copilot", true], ["claude", true], ["chatgpt", false], ["perplexity", false]];
+  gk.forEach(([k, ok], i) => {
+    const x = 40 + i * 262;
+    s += card(x, R2y, 246, R2h, ok ? "#cfe5df" : "#f7e6a6");
+    s += at(A.genie(k, { ...nd, id: "g-" + k, approved: ok }), x + 123, R2y + 438, 0.8);
+    s += label((ok ? "APPROVATO · " : "GRATIS · ") + k.toUpperCase(), x + 123, R2y + 462, ok ? 200 : 180);
+  });
+  s += card(1096, R2y, 784, R2h, "#f1e6cd");
+  const mid = at(A.badge({ ...nd, id: "ob", mouth: "smile", led: "ok" }), 760, 960, 1) + at(A.genie("claude", { ...nd, id: "og", approved: true }), 1080, 960, 0.95);
+  s += `<clipPath id="sheetOfficeClip"><rect x="1116" y="${R2y + 20}" width="744" height="418" rx="12"/></clipPath><g clip-path="url(#sheetOfficeClip)"><g transform="translate(1116,${R2y + 20}) scale(0.3875)">${A.office({ ...nd, mid })}</g></g>`;
+  s += `<rect x="1116" y="${R2y + 20}" width="744" height="418" rx="12" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2"/>`;
+  s += `<text x="1116" y="${R2y + 466}" font-family="Inter" font-weight="800" font-size="12.5" letter-spacing="1.6" fill="#8c6a43">PROFONDITÀ · PARETE 0.06 · FINESTRA 0.2 · PORTA 0.36 · SCRIVANIA 0.52 · PERSONAGGI 0.7 · BORDO 0.88 · PRIMO PIANO 1.0</text>`;
+  document.getElementById("root").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">${s}</svg>`;
+})();
+</script>
+</body></html>

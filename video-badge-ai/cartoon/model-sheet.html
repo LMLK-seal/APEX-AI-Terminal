@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Foglio modello · Sono un contratto</title>
+<style>
+  @font-face { font-family: "EB Garamond"; font-weight: 700; src: url(fonts/eb-garamond-latin-700-normal.woff2); }
+  @font-face { font-family: "EB Garamond"; font-weight: 400; src: url(fonts/eb-garamond-latin-400-normal.woff2); }
+  @font-face { font-family: "Inter"; font-weight: 400; src: url(fonts/inter-latin-400-normal.woff2); }
+  @font-face { font-family: "Inter"; font-weight: 600; src: url(fonts/inter-latin-600-normal.woff2); }
+  @font-face { font-family: "Inter"; font-weight: 800; src: url(fonts/inter-latin-800-normal.woff2); }
+  * { margin: 0; box-sizing: border-box; }
+  body { width: 2400px; background: #efe6d6; color: #1c2230; font-family: Inter; padding: 70px 90px 80px;
+         background-image: radial-gradient(#d9ccb5 1.2px, transparent 1.2px); background-size: 28px 28px; }
+  h1 { font-family: "EB Garamond"; font-size: 84px; line-height: 1; }
+  .sub { font-size: 24px; color: #5d5a52; margin-top: 12px; }
+  .kicker { font-weight: 800; font-size: 18px; letter-spacing: .16em; text-transform: uppercase; color: #9a3f17; }
+  .row { display: flex; gap: 28px; margin-top: 40px; }
+  .card { background: #f8f3ea; border-radius: 18px; padding: 26px 26px 18px; box-shadow: 0 2px 0 #d6c8ae, 0 18px 40px rgba(60,40,10,.12); }
+  .card h2 { font-family: "EB Garamond"; font-size: 40px; margin: 6px 0 4px; }
+  .card p { font-size: 19px; color: #5d5a52; line-height: 1.4; max-width: 520px; }
+  .lab { text-align: center; font-weight: 600; font-size: 18px; color: #3a3d45; margin-top: 4px; }
+  .sw { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+  .sw div { width: 110px; font-size: 14px; color: #3a3d45; } .sw i { display: block; height: 64px; border-radius: 10px; border: 3px solid #1c2230; margin-bottom: 6px; }
+  svg { display: block; overflow: visible; }
+</style>
+<script src="characters.js"></script>
+</head>
+<body>
+  <div class="kicker">Usare l'IA in sicurezza · Lezione 3 · Character design</div>
+  <h1>Sono un contratto — foglio modello</h1>
+  <div class="sub">Solo oggetti con caratteristiche umane. Contorno d'inchiostro sui personaggi, un tono d'ombra e uno di luce per colore. Gli sfondi saranno dipinti, senza contorni.</div>
+
+  <div class="row">
+    <div class="card" style="flex: 1.35">
+      <div class="kicker">Protagonista</div><h2>Il Contratto</h2>
+      <p>Tre pagine, due firme, molto orgoglioso dei suoi dati riservati. Puntiglioso e ironico: commenta quello che gli succede. Il sopracciglio unico è la riga del titolo.</p>
+      <div id="turn" style="display:flex; justify-content:space-around; align-items:flex-end; margin-top:10px"></div>
+    </div>
+    <div class="card" style="flex: 1">
+      <div class="kicker">Recitazione</div><h2>Espressioni</h2>
+      <div id="expr" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 6px 0; margin-top: 8px"></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card" style="flex: 1">
+      <div class="kicker">Lip-sync</div><h2>Forme della bocca</h2>
+      <p>Visemi per l'italiano (lingua fonetica: lettere → forme), sincronizzati con i tempi parola per parola di faster-whisper.</p>
+      <div id="visemes" style="display:flex; gap: 8px; margin-top: 14px"></div>
+    </div>
+    <div class="card" style="flex: 1.1">
+      <div class="kicker">Colore</div><h2>Palette</h2>
+      <p>Kraft caldo = casa e azienda. Blu notte = fuori, dove finiscono i dati. Rame = accento del corso. Giallo acido = ChatGratis (troppo bello per essere vero). Verde petrolio = strumento approvato.</p>
+      <div class="sw" id="sw"></div>
+    </div>
+  </div>
+
+  <div class="row" id="cast"></div>
+
+<script>
+const { P, contratto, mouse, chatgratis, assistente, server, mouth } = Chars;
+const svg = (w, h, inner, vb) => `<svg width="${w}" height="${h}" viewBox="${vb}">${inner}</svg>`;
+// rotazione: fronte, tre quarti, profilo
+document.getElementById("turn").innerHTML = [
+  ["Fronte", contratto({ armL: [-160, -130, 0.3], armR: [158, -205, -0.35, "open"], mouth: "smile", eyes: { px: 0.1 } })],
+  ["Tre quarti", contratto({ turn: 0.6, armL: [-140, -110, 0.3], armR: [150, -120, -0.3], mouth: "rest", eyes: { px: 0.5 } })],
+  ["Profilo (sottilissimo)", contratto({ view: "profile" })],
+].map(([l, g]) => `<div>${svg(300, 420, g, "-170 -360 340 380")}<div class="lab">${l}</div></div>`).join("");
+// espressioni
+const E = [
+  ["Neutro", { mouth: "rest" }],
+  ["Sorpreso", { brow: { y: -310, curve: 14 }, eyes: { open: 1.15, py: -0.2 }, mouth: "O", armL: [-150, -230, 0.2], armR: [150, -230, -0.2] }],
+  ["Preoccupato", { brow: { tilt: 0, curve: 22, y: -300 }, eyes: { px: -0.5, py: 0.35, open: 1.08 }, mouth: "worried", sweat: true, armL: [-70, -128, 0.7], armR: [70, -128, -0.7] }],
+  ["Impassibile (ironico)", { brow: { tilt: -2, curve: 0, y: -290 }, eyes: { lid: 0.48 }, mouth: "flat" }],
+  ["Furbo", { brow: { tilt: 10, curve: 6 }, eyes: { px: 0.8, lid: 0.3 }, mouth: "smirk", armR: [168, -232, -0.25, "point"], armL: [-110, -70, 0.4] }],
+  ["Felice", { brow: { y: -306, curve: 16 }, eyes: { open: 0, happy: true }, mouth: "A", armL: [-160, -260, 0.2], armR: [160, -260, -0.2] }],
+];
+document.getElementById("expr").innerHTML = E.map(([l, o]) => `<div>${svg(240, 300, contratto(o), "-175 -360 350 380")}<div class="lab">${l}</div></div>`).join("");
+// visemi
+const V = [["A", "a"], ["E", "e"], ["I", "i"], ["O", "o"], ["U", "u"], ["MBP", "m b p"], ["FV", "f v"], ["rest", "pausa"]];
+document.getElementById("visemes").innerHTML = V.map(([k, l]) => `<div style="background:${P.paper}; border:3px solid ${P.ink}; border-radius:14px; padding:14px 8px 8px">${svg(98, 70, mouth(k, 1.4), "-40 -28 80 56")}<div class="lab">${l}</div></div>`).join("");
+// palette
+const SW = [["Inchiostro", P.ink], ["Carta", P.paper], ["Ombra carta", P.paperShade], ["Kraft", P.kraft], ["Rame", P.copper], ["Rame chiaro", P.copperLight],
+            ["Blu notte", P.navy], ["Blu medio", P.navyMid], ["Giallo Gratis", P.gratis], ["Magenta", P.gratisPink], ["Verde petrolio", P.teal], ["Ottone", P.brass]];
+document.getElementById("sw").innerHTML = SW.map(([n, c]) => `<div><i style="background:${c}"></i>${n}<br><span style="color:#8a857a">${c}</span></div>`).join("");
+// cast
+const C = [
+  ["Il Mouse frettoloso", "Ha fretta, ha il caffè in mano, ha sempre una scorciatoia. È lui che copia e incolla il contratto.", mouse({}), "-170 -300 340 310"],
+  ["ChatGratis", "Il chatbot trovato online: troppo simpatico, troppo gratis. Ti accoglie a braccia aperte e non dice dove porta i tuoi dati.", chatgratis({}), "-250 -350 500 300"],
+  ["L'Assistente aziendale", "Lo strumento approvato: calmo, affidabile, con il lucchetto. Fa lo stesso lavoro, in trenta secondi, e i dati restano in casa.", assistente({}), "-230 -330 460 270"],
+  ["Il Server sconosciuto", "Sta fuori dall'azienda, al buio, in un paese che nessuno conosce. Non parla: guarda.", server({}), "-120 -440 240 450"],
+];
+document.getElementById("cast").innerHTML = C.map(([n, d, g, vb]) => `<div class="card" style="flex:1"><div class="kicker">Personaggio</div><h2>${n}</h2><p style="min-height:110px">${d}</p>${svg(500, 330, g, vb)}</div>`).join("");
+</script>
+</body>
+</html>
